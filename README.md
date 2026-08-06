@@ -1,6 +1,6 @@
 # Alentour
 
-Application mobile de découverte d'événements géolocalisés (Abidjan).
+Alentour répond à un problème concret : à Abidjan, les événements circulent sur Instagram, WhatsApp et les affiches de rue. Il n'existe pas d'endroit unique pour savoir ce qui se passe près de chez soi ce soir, ni de moyen simple pour un organisateur de toucher un public au-delà de ses propres contacts. L'app réunit les deux : les participants trouvent les événements triés par distance réelle et réservent leur place en un geste, les organisateurs publient et voient qui vient.
 
 ## Stack
 
