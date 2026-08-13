@@ -1,28 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
 import { ActivityIndicator, FlatList, Text, View } from "react-native";
 import { CarteEvenement } from "@/components/CarteEvenement";
 import { recupererEvenements } from "@/features/events/api";
-import { distanceKm } from "@/lib/distance";
 import { usePosition } from "@/lib/usePosition";
-import type { EvenementAvecDistance } from "@/types/event";
 
 export default function AutourDeMoi() {
   const position = usePosition();
+  // Le tri par distance est fait par l'API (regle de domaine n.1 : haversine
+  // en SQL, jamais en JavaScript). On se contente d'envoyer lat/lng quand ils
+  // sont connus ; sans position, l'API renvoie les evenements sans distance.
+  const coordonnees = position.statut === "ok" ? { lat: position.latitude, lng: position.longitude } : null;
+
   const { data, isPending, isError } = useQuery({
-    queryKey: ["evenements"],
-    queryFn: recupererEvenements,
+    queryKey: ["evenements", coordonnees],
+    queryFn: () => recupererEvenements(coordonnees ?? {}),
   });
 
-  const evenements = useMemo<EvenementAvecDistance[]>(() => {
-    if (!data) return [];
-    if (position.statut !== "ok") {
-      return data.map((e) => ({ ...e, distanceKm: null }));
-    }
-    return data
-      .map((e) => ({ ...e, distanceKm: distanceKm(position, e) }))
-      .sort((a, b) => (a.distanceKm ?? 0) - (b.distanceKm ?? 0));
-  }, [data, position]);
+  const evenements = data ?? [];
 
   if (isPending) {
     return (

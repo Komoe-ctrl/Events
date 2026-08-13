@@ -3,10 +3,11 @@ import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { recupererEvenement } from "@/features/events/api";
+import { ErreurApi } from "@/lib/apiClient";
 
 export default function FicheEvenement() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data, isPending } = useQuery({
+  const { data, isPending, error } = useQuery({
     queryKey: ["evenement", id],
     queryFn: () => recupererEvenement(id),
     enabled: Boolean(id),
@@ -20,12 +21,21 @@ export default function FicheEvenement() {
     );
   }
 
-  if (!data) {
+  if (error) {
+    const introuvable = error instanceof ErreurApi && error.statutHttp === 404;
     return (
       <View className="flex-1 items-center justify-center bg-surface px-8">
-        <Text className="text-center text-ink-muted">Événement introuvable.</Text>
+        <Text className="text-center text-ink-muted">
+          {introuvable
+            ? "Événement introuvable."
+            : "Impossible de charger cet événement. Vérifie ta connexion."}
+        </Text>
       </View>
     );
+  }
+
+  if (!data) {
+    return null;
   }
 
   return (
