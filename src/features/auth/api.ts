@@ -1,5 +1,12 @@
 import { appelApi } from "@/lib/apiClient";
-import { ecrireJeton, supprimerJeton } from "@/lib/authStorage";
+import {
+  ecrireJeton,
+  ecrireUtilisateur,
+  lireJeton,
+  lireUtilisateur,
+  supprimerJeton,
+  supprimerUtilisateur,
+} from "@/lib/authStorage";
 import type { ReponseAuth, RoleUtilisateur, Utilisateur } from "@/types/utilisateur";
 
 export type DonneesConnexion = {
@@ -20,7 +27,7 @@ export async function connexion(donnees: DonneesConnexion): Promise<Utilisateur>
     methode: "POST",
     corps: donnees,
   });
-  await ecrireJeton(reponse.jeton);
+  await Promise.all([ecrireJeton(reponse.jeton), ecrireUtilisateur(reponse.utilisateur)]);
   return reponse.utilisateur;
 }
 
@@ -29,12 +36,28 @@ export async function inscription(donnees: DonneesInscription): Promise<Utilisat
     methode: "POST",
     corps: donnees,
   });
-  await ecrireJeton(reponse.jeton);
+  await Promise.all([ecrireJeton(reponse.jeton), ecrireUtilisateur(reponse.utilisateur)]);
   return reponse.utilisateur;
 }
 
 /** Pas d'endpoint de deconnexion dans le contrat API — un JWT se "deconnecte"
- * en supprimant simplement le jeton local. */
+ * en supprimant simplement le jeton et le profil locaux. */
 export async function deconnexion(): Promise<void> {
-  await supprimerJeton();
+  await Promise.all([supprimerJeton(), supprimerUtilisateur()]);
+}
+
+/**
+ * Restaure la session au demarrage depuis le stockage local, sans appel
+ * reseau (aucun endpoint pour ca). Si l'un des deux seulement est present
+ * (etat incoherent — stockage corrompu, ecriture partielle interrompue...),
+ * on efface tout et on repart d'un etat deconnecte propre plutot que
+ * d'exposer un utilisateur avec un jeton absent ou invalide.
+ */
+export async function restaurerSession(): Promise<Utilisateur | null> {
+  const [jeton, utilisateur] = await Promise.all([lireJeton(), lireUtilisateur()]);
+  if (!jeton || !utilisateur) {
+    await Promise.all([supprimerJeton(), supprimerUtilisateur()]);
+    return null;
+  }
+  return utilisateur;
 }
