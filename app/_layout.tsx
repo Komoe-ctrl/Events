@@ -31,6 +31,18 @@ export default function RootLayout() {
               name="inscription"
               options={{ presentation: "modal", title: "Créer un compte" }}
             />
+            <Stack.Screen
+              name="mes-reservations"
+              options={{ title: "Mes réservations", headerBackTitle: "Retour" }}
+            />
+            <Stack.Screen
+              name="mes-evenements"
+              options={{ title: "Mes événements", headerBackTitle: "Retour" }}
+            />
+            <Stack.Screen
+              name="moderation"
+              options={{ title: "Modération", headerBackTitle: "Retour" }}
+            />
           </Stack>
         </AuthProvider>
       </QueryClientProvider>
