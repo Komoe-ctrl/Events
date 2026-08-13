@@ -1,44 +1,80 @@
-import type { Evenement } from "@/types/event";
+import { appelApi } from "@/lib/apiClient";
+import type { CategorieEvenement, Evenement, StatutEvenement } from "@/types/event";
 
-const DONNEES_TEST: Evenement[] = [
-  {
-    id: "1",
-    titre: "Nuit du Coupé-Décalé",
-    description: "Une nuit entière dédiée aux classiques du coupé-décalé.",
-    image: "https://placehold.co/800x500/F26A21/FFFFFF/png?text=Concert",
-    categorie: "concert",
-    dateDebut: "2026-08-15T21:00:00+00:00",
-    dateFin: "2026-08-16T04:00:00+00:00",
-    prix: 10000,
-    latitude: 5.3167,
-    longitude: -4.0333,
-    adresse: "Palais de la Culture",
-    commune: "Treichville",
-    contactOrganisateur: "+2250700000000",
-  },
-  {
-    id: "2",
-    titre: "Meetup Devs Abidjan",
-    description: "Rencontre mensuelle des développeurs de la ville.",
-    image: "https://placehold.co/800x500/14110F/FFFFFF/png?text=Meetup",
-    categorie: "conference",
-    dateDebut: "2026-08-12T17:30:00+00:00",
-    dateFin: null,
-    prix: null,
-    latitude: 5.3599,
-    longitude: -3.9962,
-    adresse: "Cocody, II Plateaux",
-    commune: "Cocody",
-    contactOrganisateur: "+2250700000001",
-  },
-];
+type FiltresEvenements = {
+  lat?: number;
+  lng?: number;
+  rayonKm?: number;
+  categorie?: CategorieEvenement;
+  dateMin?: string;
+  dateMax?: string;
+};
 
-export async function recupererEvenements(): Promise<Evenement[]> {
-  await new Promise((r) => setTimeout(r, 300));
-  return DONNEES_TEST;
+function chaineRequete(filtres: FiltresEvenements): string {
+  const params = new URLSearchParams();
+  if (filtres.lat !== undefined) params.set("lat", String(filtres.lat));
+  if (filtres.lng !== undefined) params.set("lng", String(filtres.lng));
+  if (filtres.rayonKm !== undefined) params.set("rayonKm", String(filtres.rayonKm));
+  if (filtres.categorie !== undefined) params.set("categorie", filtres.categorie);
+  if (filtres.dateMin !== undefined) params.set("dateMin", filtres.dateMin);
+  if (filtres.dateMax !== undefined) params.set("dateMax", filtres.dateMax);
+  const requete = params.toString();
+  return requete ? `?${requete}` : "";
 }
 
-export async function recupererEvenement(id: string): Promise<Evenement | null> {
-  const tous = await recupererEvenements();
-  return tous.find((e) => e.id === id) ?? null;
+export function recupererEvenements(filtres: FiltresEvenements = {}): Promise<Evenement[]> {
+  return appelApi<Evenement[]>(`/evenements${chaineRequete(filtres)}`);
+}
+
+/** Leve ErreurApi (code EVENEMENT_INTROUVABLE ou equivalent) si id inconnu — ne renvoie plus null. */
+export function recupererEvenement(id: string): Promise<Evenement> {
+  return appelApi<Evenement>(`/evenements/${id}`);
+}
+
+export type DonneesEvenement = {
+  titre: string;
+  description: string;
+  image: string;
+  categorie: CategorieEvenement;
+  dateDebut: string;
+  dateFin?: string;
+  prix?: number;
+  capacite?: number;
+  latitude: number;
+  longitude: number;
+  adresse: string;
+  commune: string;
+  contactOrganisateur: string;
+};
+
+export function creerEvenement(donnees: DonneesEvenement): Promise<Evenement> {
+  return appelApi<Evenement>("/evenements", { methode: "POST", corps: donnees });
+}
+
+export function modifierEvenement(
+  id: string,
+  donnees: Partial<DonneesEvenement>,
+): Promise<Evenement> {
+  return appelApi<Evenement>(`/evenements/${id}`, { methode: "PATCH", corps: donnees });
+}
+
+/** Toutes les publications de l'organisateur connecte, tous statuts confondus. */
+export function recupererMesEvenements(): Promise<Evenement[]> {
+  return appelApi<Evenement[]>("/moi/evenements");
+}
+
+/** ADMIN uniquement — file de moderation. */
+export function recupererEvenementsAModerer(): Promise<Evenement[]> {
+  return appelApi<Evenement[]>("/admin/evenements");
+}
+
+/** ADMIN uniquement. */
+export function modererEvenement(
+  id: string,
+  donnees: { statut: Extract<StatutEvenement, "PUBLIE" | "REFUSE">; motifRefus?: string },
+): Promise<Evenement> {
+  return appelApi<Evenement>(`/admin/evenements/${id}/statut`, {
+    methode: "PATCH",
+    corps: donnees,
+  });
 }
