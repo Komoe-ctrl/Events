@@ -63,7 +63,16 @@ export async function appelApi<T>(chemin: string, options: OptionsAppel = {}): P
     throw new Error("EXPO_PUBLIC_API_URL n'est pas defini.");
   }
 
-  const jeton = await lireJetonActuel();
+  // Une erreur de lecture du jeton (stockage indisponible sur la plateforme,
+  // valeur corrompue, etc.) ne doit jamais empecher un appel vers un endpoint
+  // public — on degrade vers "pas de jeton" plutot que de faire echouer toute
+  // la requete.
+  let jeton: string | null;
+  try {
+    jeton = await lireJetonActuel();
+  } catch {
+    jeton = null;
+  }
 
   let reponse: Response;
   try {
