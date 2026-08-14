@@ -54,6 +54,11 @@ export default function Moderation() {
       contentContainerClassName="px-4 pt-4 pb-8"
       data={evenements}
       keyExtractor={(item) => item.id}
+      ListHeaderComponent={
+        <Text className="mb-3 text-sm font-medium text-ink-muted">
+          {evenements.length} événement{evenements.length > 1 ? "s" : ""} en attente
+        </Text>
+      }
       renderItem={({ item }) => <CarteAModerer evenement={item} />}
     />
   );
