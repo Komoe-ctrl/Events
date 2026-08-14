@@ -1,19 +1,24 @@
 import { appelApi } from "@/lib/apiClient";
+import { cacherReservations, lireReservationEnCache } from "@/lib/reservationCache";
 import type { Reservation } from "@/types/reservation";
 
-export function creerReservation(
+export async function creerReservation(
   evenementId: string,
   nombrePlaces?: number,
 ): Promise<Reservation> {
-  return appelApi<Reservation>(`/evenements/${evenementId}/reservations`, {
+  const reservation = await appelApi<Reservation>(`/evenements/${evenementId}/reservations`, {
     methode: "POST",
     corps: nombrePlaces !== undefined ? { nombrePlaces } : undefined,
   });
+  await cacherReservations([reservation]);
+  return reservation;
 }
 
 /** Annulation par le participant lui-meme (proprietaire verifie cote serveur). */
-export function annulerReservation(id: string): Promise<Reservation> {
-  return appelApi<Reservation>(`/reservations/${id}`, { methode: "DELETE" });
+export async function annulerReservation(id: string): Promise<Reservation> {
+  const reservation = await appelApi<Reservation>(`/reservations/${id}`, { methode: "DELETE" });
+  await cacherReservations([reservation]);
+  return reservation;
 }
 
 /** Scan a l'entree par l'organisateur : marque la reservation UTILISEE. */
@@ -24,6 +29,13 @@ export function validerReservation(code: string): Promise<Reservation> {
   });
 }
 
-export function recupererMesReservations(): Promise<Reservation[]> {
-  return appelApi<Reservation[]>("/moi/reservations");
+export async function recupererMesReservations(): Promise<Reservation[]> {
+  const reservations = await appelApi<Reservation[]>("/moi/reservations");
+  await cacherReservations(reservations);
+  return reservations;
+}
+
+/** Lecture locale seule, sans reseau — repli pour l'ecran de detail (etape 4). */
+export function recupererReservationEnCache(id: string): Promise<Reservation | null> {
+  return lireReservationEnCache(id);
 }
