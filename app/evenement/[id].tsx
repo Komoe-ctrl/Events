@@ -194,12 +194,12 @@ export default function FicheEvenement() {
                 disabled={mutationReservation.isPending || etat.statut === "chargement"}
                 className="items-center rounded-card bg-brand-500 py-3.5 active:opacity-80 disabled:opacity-50"
               >
+                {/* Anton reserve aux titres, pas aux libelles/boutons —
+                    meme traitement que les autres actions primaires. */}
                 {mutationReservation.isPending ? (
                   <ActivityIndicator color="#1A1410" />
                 ) : (
-                  <Text className="font-display text-display-sm uppercase tracking-wide text-ink">
-                    Réserver
-                  </Text>
+                  <Text className="text-base font-medium text-ink">Réserver</Text>
                 )}
               </Pressable>
             </>
