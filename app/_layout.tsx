@@ -63,6 +63,10 @@ export default function RootLayout() {
               name="moderation"
               options={{ title: "Modération", headerBackTitle: "Retour" }}
             />
+            <Stack.Screen
+              name="moderation/[id]"
+              options={{ title: "", headerBackTitle: "Retour" }}
+            />
           </Stack>
         </AuthProvider>
       </QueryClientProvider>
