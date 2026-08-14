@@ -1,12 +1,18 @@
-import { useQuery } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router";
-import { ActivityIndicator, Text, View } from "react-native";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { router, useLocalSearchParams } from "expo-router";
+import { ActivityIndicator, Alert, Pressable, Text, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
-import { recupererMesReservations, recupererReservationEnCache } from "@/features/reservations/api";
+import {
+  annulerReservation,
+  recupererMesReservations,
+  recupererReservationEnCache,
+} from "@/features/reservations/api";
+import { ErreurApi } from "@/lib/apiClient";
 import { formaterDateEvenement } from "@/lib/date";
 
 export default function DetailReservation() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const queryClient = useQueryClient();
 
   // Source principale : le reseau, a jour (statut peut avoir change entre
   // temps, ex. UTILISEE apres un scan). Marche aussi sans reseau : source
@@ -22,6 +28,30 @@ export default function DetailReservation() {
   });
 
   const reservation = enLigne.data?.find((r) => r.id === id) ?? enCache.data ?? undefined;
+
+  const mutationAnnulation = useMutation({
+    mutationFn: () => annulerReservation(id),
+    onSuccess: (annulee) => {
+      queryClient.invalidateQueries({ queryKey: ["reservations", "moi"] });
+      queryClient.invalidateQueries({ queryKey: ["evenement", annulee.evenementId] });
+      router.back();
+    },
+  });
+
+  const confirmerAnnulation = () => {
+    Alert.alert(
+      "Annuler la réservation ?",
+      "Vous pourrez réserver à nouveau si vous changez d'avis.",
+      [
+        { text: "Non", style: "cancel" },
+        {
+          text: "Annuler la réservation",
+          style: "destructive",
+          onPress: () => mutationAnnulation.mutate(),
+        },
+      ],
+    );
+  };
 
   if (enLigne.isPending && enCache.isPending) {
     return (
@@ -67,6 +97,29 @@ export default function DetailReservation() {
           {reservation.nombrePlaces} place{reservation.nombrePlaces > 1 ? "s" : ""}
         </Text>
       </View>
+
+      {reservation.statut === "CONFIRMEE" ? (
+        <View className="mt-10">
+          <Pressable
+            onPress={confirmerAnnulation}
+            disabled={mutationAnnulation.isPending}
+            className="items-center rounded-xl border border-line py-3 active:opacity-70 disabled:opacity-50"
+          >
+            {mutationAnnulation.isPending ? (
+              <ActivityIndicator color="#6B6560" />
+            ) : (
+              <Text className="text-base font-medium text-ink">Annuler la réservation</Text>
+            )}
+          </Pressable>
+          {mutationAnnulation.isError ? (
+            <Text className="mt-2 text-center text-sm text-red-600">
+              {mutationAnnulation.error instanceof ErreurApi
+                ? mutationAnnulation.error.message
+                : "Impossible d'annuler. Vérifie ta connexion."}
+            </Text>
+          ) : null}
+        </View>
+      ) : null}
     </View>
   );
 }
