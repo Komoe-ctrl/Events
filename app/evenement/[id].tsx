@@ -1,17 +1,62 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Image } from "expo-image";
-import { useLocalSearchParams } from "expo-router";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { useAuth } from "@/features/auth/AuthContext";
 import { recupererEvenement } from "@/features/events/api";
+import { creerReservation, recupererMesReservations } from "@/features/reservations/api";
 import { ErreurApi } from "@/lib/apiClient";
 
 export default function FicheEvenement() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { etat } = useAuth();
+  const queryClient = useQueryClient();
+
   const { data, isPending, error } = useQuery({
     queryKey: ["evenement", id],
     queryFn: () => recupererEvenement(id),
     enabled: Boolean(id),
   });
+
+  const { data: mesReservations } = useQuery({
+    queryKey: ["reservations", "moi"],
+    queryFn: recupererMesReservations,
+    enabled: etat.statut === "connecte",
+  });
+
+  const reservationExistante = mesReservations?.find(
+    (r) => r.evenementId === id && r.statut !== "ANNULEE",
+  );
+
+  const mutationReservation = useMutation({
+    mutationFn: () => creerReservation(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["evenement", id] });
+      queryClient.invalidateQueries({ queryKey: ["reservations", "moi"] });
+    },
+    onError: (erreur) => {
+      if (!(erreur instanceof ErreurApi)) return;
+      // Course perdue : quelqu'un a pris la derniere place, ou une
+      // reservation existait deja sans que le cache local le sache (deux
+      // onglets, par exemple). Dans les deux cas l'affichage courant est
+      // perime — on le corrige plutot que de laisser un bouton "Reserver"
+      // actif sur un evenement complet ou deja reserve.
+      if (erreur.code === "CAPACITE_INSUFFISANTE") {
+        queryClient.invalidateQueries({ queryKey: ["evenement", id] });
+      } else if (erreur.code === "RESERVATION_DEJA_ACTIVE") {
+        queryClient.invalidateQueries({ queryKey: ["evenement", id] });
+        queryClient.invalidateQueries({ queryKey: ["reservations", "moi"] });
+      }
+    },
+  });
+
+  const gererReservation = () => {
+    if (etat.statut !== "connecte") {
+      router.push("/connexion");
+      return;
+    }
+    mutationReservation.mutate();
+  };
 
   if (isPending) {
     return (
@@ -38,6 +83,8 @@ export default function FicheEvenement() {
     return null;
   }
 
+  const complet = data.placesRestantes === 0;
+
   return (
     <ScrollView className="flex-1 bg-surface">
       <Image
@@ -51,6 +98,42 @@ export default function FicheEvenement() {
           {data.adresse} · {data.commune}
         </Text>
         <Text className="mt-4 text-base leading-6 text-ink">{data.description}</Text>
+
+        <View className="mt-6">
+          {reservationExistante ? (
+            <View className="rounded-xl border border-line bg-surface-sunken p-4">
+              <Text className="text-sm text-ink">
+                Vous avez déjà réservé {reservationExistante.nombrePlaces} place
+                {reservationExistante.nombrePlaces > 1 ? "s" : ""}.
+              </Text>
+              <Text className="mt-1 text-sm text-ink-muted">
+                Code : {reservationExistante.code}
+              </Text>
+            </View>
+          ) : complet ? (
+            <View className="items-center rounded-xl bg-surface-sunken py-3">
+              <Text className="text-base font-medium text-ink-muted">Complet</Text>
+            </View>
+          ) : (
+            <Pressable
+              onPress={gererReservation}
+              disabled={mutationReservation.isPending || etat.statut === "chargement"}
+              className="items-center rounded-xl bg-brand-600 py-3 active:opacity-80 disabled:opacity-50"
+            >
+              {mutationReservation.isPending ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text className="text-base font-medium text-white">Réserver</Text>
+              )}
+            </Pressable>
+          )}
+
+          {mutationReservation.isError ? (
+            <Text className="mt-2 text-sm text-red-600">
+              {mutationReservation.error.message}
+            </Text>
+          ) : null}
+        </View>
       </View>
     </ScrollView>
   );

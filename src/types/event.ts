@@ -19,6 +19,8 @@ export type Evenement = {
   dateFin: string | null;
   prix: number | null;
   capacite: number | null;
+  /** capacite moins les places deja reservees (CONFIRMEE + UTILISEE). null = illimite, comme capacite. */
+  placesRestantes: number | null;
   latitude: number;
   longitude: number;
   adresse: string;
