@@ -102,8 +102,9 @@ function BadgeStatut({ statut }: { statut: StatutEvenement }) {
     BROUILLON: { classe: "bg-surface-sunken text-ink-faint", libelle: "Brouillon" },
     // Palette semantique distincte de l'accent : chaque statut a sa propre
     // famille de couleur, aucune ne recycle l'orange (regle de discipline
-    // couleur).
-    EN_ATTENTE: { classe: "bg-amber-50 text-amber-700", libelle: "En attente de modération" },
+    // couleur). Bleu plutot qu'amber : trop proche de l'orange en teinte,
+    // et "en attente" est un etat neutre/informatif, pas un avertissement.
+    EN_ATTENTE: { classe: "bg-blue-50 text-blue-700", libelle: "En attente de modération" },
     PUBLIE: { classe: "bg-green-50 text-green-700", libelle: "Publié" },
     REFUSE: { classe: "bg-red-50 text-red-700", libelle: "Refusé" },
   };
