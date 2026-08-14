@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "expo-router";
 import { ActivityIndicator, Pressable, SectionList, Text, View } from "react-native";
+import { BadgeStatutReservation } from "@/components/BadgeStatutReservation";
 import { recupererMesReservations } from "@/features/reservations/api";
 import { formaterDateEvenement } from "@/lib/date";
-import type { Reservation, StatutReservation } from "@/types/reservation";
+import type { Reservation } from "@/types/reservation";
 
 export default function MesReservations() {
   const { data, isPending, isError } = useQuery({
@@ -88,23 +89,9 @@ function CarteReservation({ reservation }: { reservation: Reservation }) {
           <Text className="text-xs text-ink-faint">
             {reservation.nombrePlaces} place{reservation.nombrePlaces > 1 ? "s" : ""}
           </Text>
-          <BadgeStatut statut={reservation.statut} />
+          <BadgeStatutReservation statut={reservation.statut} />
         </View>
       </Pressable>
     </Link>
-  );
-}
-
-function BadgeStatut({ statut }: { statut: StatutReservation }) {
-  const styles: Record<StatutReservation, { classe: string; libelle: string }> = {
-    CONFIRMEE: { classe: "bg-brand-50 text-brand-700", libelle: "Confirmée" },
-    UTILISEE: { classe: "bg-surface-sunken text-ink-muted", libelle: "Utilisée" },
-    ANNULEE: { classe: "bg-surface-sunken text-ink-faint", libelle: "Annulée" },
-  };
-  const { classe, libelle } = styles[statut];
-  return (
-    <Text className={`overflow-hidden rounded-full px-2 py-1 text-xs font-medium ${classe}`}>
-      {libelle}
-    </Text>
   );
 }

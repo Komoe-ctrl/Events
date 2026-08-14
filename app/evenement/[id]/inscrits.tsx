@@ -1,0 +1,82 @@
+import { useQuery } from "@tanstack/react-query";
+import { Link, useLocalSearchParams } from "expo-router";
+import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
+import { BadgeStatutReservation } from "@/components/BadgeStatutReservation";
+import { recupererInscrits } from "@/features/reservations/api";
+import type { ReservationOrganisateur } from "@/types/reservation";
+
+function BoutonValiderBillet({ evenementId }: { evenementId: string }) {
+  return (
+    <Link href={`/evenement/${evenementId}/scanner`} asChild>
+      <Pressable className="mb-4 items-center rounded-xl bg-brand-600 py-3 active:opacity-80">
+        <Text className="text-base font-medium text-white">Valider un billet</Text>
+      </Pressable>
+    </Link>
+  );
+}
+
+export default function Inscrits() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { data, isPending, isError } = useQuery({
+    queryKey: ["evenements", id, "inscrits"],
+    queryFn: () => recupererInscrits(id),
+    enabled: Boolean(id),
+  });
+
+  if (isPending) {
+    return (
+      <View className="flex-1 items-center justify-center bg-surface-sunken">
+        <ActivityIndicator color="#D85314" />
+      </View>
+    );
+  }
+
+  if (isError) {
+    return (
+      <View className="flex-1 items-center justify-center bg-surface-sunken px-8">
+        <Text className="text-center text-ink-muted">
+          Impossible de charger les inscrits. Vérifie ta connexion.
+        </Text>
+      </View>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <View className="flex-1 bg-surface-sunken px-4 pt-4">
+        <BoutonValiderBillet evenementId={id} />
+        <View className="flex-1 items-center justify-center px-4 pb-16">
+          <Text className="text-center text-ink-muted">
+            Aucune réservation pour le moment.
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <FlatList
+      className="bg-surface-sunken"
+      contentContainerClassName="px-4 pt-4 pb-8"
+      data={data}
+      keyExtractor={(item) => item.id}
+      ListHeaderComponent={<BoutonValiderBillet evenementId={id} />}
+      renderItem={({ item }) => <LigneInscrit reservation={item} />}
+    />
+  );
+}
+
+function LigneInscrit({ reservation }: { reservation: ReservationOrganisateur }) {
+  return (
+    <View className="mb-3 rounded-xl border border-line bg-surface p-4">
+      <Text className="text-base font-medium text-ink">{reservation.utilisateur.nom}</Text>
+      <Text className="mt-1 text-sm text-ink-muted">{reservation.utilisateur.telephone}</Text>
+      <View className="mt-2 flex-row items-center justify-between">
+        <Text className="text-xs text-ink-faint">
+          {reservation.nombrePlaces} place{reservation.nombrePlaces > 1 ? "s" : ""}
+        </Text>
+        <BadgeStatutReservation statut={reservation.statut} />
+      </View>
+    </View>
+  );
+}

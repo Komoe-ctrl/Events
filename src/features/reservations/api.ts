@@ -1,6 +1,6 @@
 import { appelApi } from "@/lib/apiClient";
 import { cacherReservations, lireReservationEnCache } from "@/lib/reservationCache";
-import type { Reservation } from "@/types/reservation";
+import type { Reservation, ReservationOrganisateur } from "@/types/reservation";
 
 export async function creerReservation(
   evenementId: string,
@@ -38,4 +38,9 @@ export async function recupererMesReservations(): Promise<Reservation[]> {
 /** Lecture locale seule, sans reseau — repli pour l'ecran de detail (etape 4). */
 export function recupererReservationEnCache(id: string): Promise<Reservation | null> {
   return lireReservationEnCache(id);
+}
+
+/** Liste des inscrits d'un evenement, reservee a son organisateur (ou un admin). */
+export function recupererInscrits(evenementId: string): Promise<ReservationOrganisateur[]> {
+  return appelApi<ReservationOrganisateur[]>(`/evenements/${evenementId}/reservations`);
 }
