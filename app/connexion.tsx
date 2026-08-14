@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text } from "react-native";
-import { Link, router } from "expo-router";
+import { Link } from "expo-router";
 import { ChampTexte } from "@/components/ChampTexte";
 import { useAuth } from "@/features/auth/AuthContext";
 import { ErreurApi, ErreurReseau } from "@/lib/apiClient";
+import { revenirOuAller } from "@/lib/navigation";
 import { normaliserTelephoneIvoirien } from "@/lib/telephone";
 
 export default function Connexion() {
@@ -29,7 +30,7 @@ export default function Connexion() {
     setEnCours(true);
     try {
       await connexion({ telephone: telephoneNormalise, motDePasse });
-      router.back();
+      revenirOuAller("/(tabs)");
     } catch (erreur) {
       if (erreur instanceof ErreurApi) {
         // IDENTIFIANTS_INVALIDES ne precise jamais si c'est le numero ou le

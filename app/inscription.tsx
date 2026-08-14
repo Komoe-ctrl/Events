@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text } from "react-native";
-import { Link, router } from "expo-router";
+import { Link } from "expo-router";
 import { ChampTexte } from "@/components/ChampTexte";
 import { useAuth } from "@/features/auth/AuthContext";
 import { ErreurApi, ErreurReseau } from "@/lib/apiClient";
+import { revenirOuAller } from "@/lib/navigation";
 import { normaliserTelephoneIvoirien } from "@/lib/telephone";
 
 export default function Inscription() {
@@ -51,7 +52,7 @@ export default function Inscription() {
         email: email.trim() || undefined,
         motDePasse,
       });
-      router.back();
+      revenirOuAller("/(tabs)");
     } catch (erreur) {
       if (erreur instanceof ErreurApi) {
         // TELEPHONE_DEJA_UTILISE / EMAIL_DEJA_UTILISE sont attaches au champ

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, Modal, Pressable, Text, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
@@ -10,6 +10,7 @@ import {
 } from "@/features/reservations/api";
 import { ErreurApi } from "@/lib/apiClient";
 import { formaterDateEvenement } from "@/lib/date";
+import { revenirOuAller } from "@/lib/navigation";
 
 export default function DetailReservation() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -36,7 +37,7 @@ export default function DetailReservation() {
     onSuccess: (annulee) => {
       queryClient.invalidateQueries({ queryKey: ["reservations", "moi"] });
       queryClient.invalidateQueries({ queryKey: ["evenement", annulee.evenementId] });
-      router.back();
+      revenirOuAller("/mes-reservations");
     },
   });
 
