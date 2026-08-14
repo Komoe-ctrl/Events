@@ -46,7 +46,14 @@
           "locationAlwaysAndWhenInUsePermission": "Alentour utilise ta position pour te montrer les événements les plus proches de toi."
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Alentour utilise l'appareil photo pour scanner le code d'une réservation à l'entrée d'un événement.",
+          "recordAudioAndroid": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
