@@ -40,7 +40,12 @@ export default function Profil() {
       </View>
 
       <EntreeMenu titre="Mes réservations" icone="ticket-outline" href="/mes-reservations" />
-      <EntreeMenu titre="Mes événements" icone="calendar-outline" href="/mes-evenements" />
+      {utilisateur.role === "ORGANISATEUR" || utilisateur.role === "ADMIN" ? (
+        <>
+          <EntreeMenu titre="Mes événements" icone="calendar-outline" href="/mes-evenements" />
+          <EntreeMenu titre="Publier un événement" icone="add-circle-outline" href="/publier" />
+        </>
+      ) : null}
       {utilisateur.role === "ADMIN" ? (
         <EntreeMenu titre="Modération" icone="shield-checkmark-outline" href="/moderation" />
       ) : null}
