@@ -7,6 +7,16 @@ import { useAuth } from "@/features/auth/AuthContext";
 import { recupererEvenement } from "@/features/events/api";
 import { creerReservation, recupererMesReservations } from "@/features/reservations/api";
 import { ErreurApi } from "@/lib/apiClient";
+import { formaterDateEvenement } from "@/lib/date";
+
+const LIBELLES_CATEGORIE: Record<string, string> = {
+  CONCERT: "Concert",
+  SOIREE: "Soirée",
+  CONFERENCE: "Conférence",
+  SPORT: "Sport",
+  CULTURE: "Culture",
+  RELIGIEUX: "Religieux",
+};
 
 export default function FicheEvenement() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -63,7 +73,7 @@ export default function FicheEvenement() {
   if (isPending) {
     return (
       <View className="flex-1 items-center justify-center bg-surface">
-        <ActivityIndicator color="#D85314" />
+        <ActivityIndicator color="#FF6B00" />
       </View>
     );
   }
@@ -93,14 +103,33 @@ export default function FicheEvenement() {
 
   return (
     <ScrollView className="flex-1 bg-surface">
-      <Image
-        source={data.image}
-        style={{ width: "100%", height: 220 }}
-        contentFit="cover"
-      />
+      <View className="relative">
+        <Image
+          source={data.image}
+          style={{ width: "100%", height: 320 }}
+          contentFit="cover"
+        />
+        {/* Meme langage que CarteEvenement : chips en aplat, pas de degrade —
+            l'ecran vedette du produit doit rester coherent avec la carte qui
+            y mene. */}
+        <View className="absolute inset-x-0 top-0 flex-row items-start justify-between p-4">
+          <Text className="overflow-hidden rounded-chip bg-brand-500 px-2 py-1 text-label font-bold uppercase text-white">
+            {LIBELLES_CATEGORIE[data.categorie] ?? data.categorie}
+          </Text>
+          <Text className="overflow-hidden rounded-chip bg-accent px-2 py-1 text-label font-bold uppercase text-accent-ink">
+            {data.prix === null ? "Gratuit" : `${data.prix.toLocaleString("fr-FR")} FCFA`}
+          </Text>
+        </View>
+      </View>
       <View className="p-5">
-        <Text className="text-xl font-medium text-ink">{data.titre}</Text>
-        <Text className="mt-2 text-sm text-ink-muted">
+        <Text className="font-display text-display-lg leading-[36px] text-ink">
+          {data.titre}
+        </Text>
+        <Text className="mt-2 text-sm font-medium text-brand-600">
+          {formaterDateEvenement(data.dateDebut)}
+          {data.dateFin ? ` → ${formaterDateEvenement(data.dateFin)}` : ""}
+        </Text>
+        <Text className="mt-1 text-sm text-ink-muted">
           {data.adresse} · {data.commune}
         </Text>
         <Text className="mt-4 text-base leading-6 text-ink">{data.description}</Text>
@@ -108,7 +137,7 @@ export default function FicheEvenement() {
         <View className="mt-6">
           {reservationExistante ? (
             <Link href={`/reservation/${reservationExistante.id}`} asChild>
-              <Pressable className="rounded-xl border border-line bg-surface-sunken p-4 active:opacity-70">
+              <Pressable className="rounded-card bg-brand-50 p-4 active:opacity-70">
                 <Text className="text-sm text-ink">
                   Vous avez déjà réservé {reservationExistante.nombrePlaces} place
                   {reservationExistante.nombrePlaces > 1 ? "s" : ""}.
@@ -119,7 +148,7 @@ export default function FicheEvenement() {
               </Pressable>
             </Link>
           ) : complet ? (
-            <View className="items-center rounded-xl bg-surface-sunken py-3">
+            <View className="items-center rounded-card bg-surface-sunken py-3">
               <Text className="text-base font-medium text-ink-muted">Complet</Text>
             </View>
           ) : (
@@ -130,7 +159,7 @@ export default function FicheEvenement() {
                   <Pressable
                     onPress={() => setNombrePlacesSaisi((n) => Math.max(1, n - 1))}
                     disabled={nombrePlaces <= 1}
-                    className="h-9 w-9 items-center justify-center rounded-full border border-line disabled:opacity-30"
+                    className="h-9 w-9 items-center justify-center rounded-full bg-surface-sunken disabled:opacity-30"
                   >
                     <Text className="text-lg text-ink">−</Text>
                   </Pressable>
@@ -140,7 +169,7 @@ export default function FicheEvenement() {
                   <Pressable
                     onPress={() => setNombrePlacesSaisi((n) => Math.min(maxPlaces, n + 1))}
                     disabled={nombrePlaces >= maxPlaces}
-                    className="h-9 w-9 items-center justify-center rounded-full border border-line disabled:opacity-30"
+                    className="h-9 w-9 items-center justify-center rounded-full bg-surface-sunken disabled:opacity-30"
                   >
                     <Text className="text-lg text-ink">+</Text>
                   </Pressable>
@@ -156,12 +185,14 @@ export default function FicheEvenement() {
               <Pressable
                 onPress={() => gererReservation(nombrePlaces)}
                 disabled={mutationReservation.isPending || etat.statut === "chargement"}
-                className="items-center rounded-xl bg-brand-600 py-3 active:opacity-80 disabled:opacity-50"
+                className="items-center rounded-card bg-brand-500 py-3.5 active:opacity-80 disabled:opacity-50"
               >
                 {mutationReservation.isPending ? (
                   <ActivityIndicator color="#FFFFFF" />
                 ) : (
-                  <Text className="text-base font-medium text-white">Réserver</Text>
+                  <Text className="font-display text-display-sm uppercase tracking-wide text-white">
+                    Réserver
+                  </Text>
                 )}
               </Pressable>
             </>
