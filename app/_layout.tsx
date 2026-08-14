@@ -44,6 +44,22 @@ export default function RootLayout() {
               options={{ title: "Mes événements", headerBackTitle: "Retour" }}
             />
             <Stack.Screen
+              name="publier"
+              options={{ title: "Publier un événement", headerBackTitle: "Retour" }}
+            />
+            <Stack.Screen
+              name="modifier-evenement/[id]"
+              options={{ title: "Modifier l'événement", headerBackTitle: "Retour" }}
+            />
+            <Stack.Screen
+              name="evenement/[id]/inscrits"
+              options={{ title: "Inscrits", headerBackTitle: "Retour" }}
+            />
+            <Stack.Screen
+              name="evenement/[id]/scanner"
+              options={{ title: "Valider un billet", headerBackTitle: "Retour" }}
+            />
+            <Stack.Screen
               name="moderation"
               options={{ title: "Modération", headerBackTitle: "Retour" }}
             />
