@@ -36,6 +36,10 @@ export default function RootLayout() {
               options={{ title: "Mes réservations", headerBackTitle: "Retour" }}
             />
             <Stack.Screen
+              name="reservation/[id]"
+              options={{ title: "", headerBackTitle: "Retour" }}
+            />
+            <Stack.Screen
               name="mes-evenements"
               options={{ title: "Mes événements", headerBackTitle: "Retour" }}
             />

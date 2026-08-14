@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Image } from "expo-image";
-import { router, useLocalSearchParams } from "expo-router";
+import { Link, router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { useAuth } from "@/features/auth/AuthContext";
@@ -107,15 +107,17 @@ export default function FicheEvenement() {
 
         <View className="mt-6">
           {reservationExistante ? (
-            <View className="rounded-xl border border-line bg-surface-sunken p-4">
-              <Text className="text-sm text-ink">
-                Vous avez déjà réservé {reservationExistante.nombrePlaces} place
-                {reservationExistante.nombrePlaces > 1 ? "s" : ""}.
-              </Text>
-              <Text className="mt-1 text-sm text-ink-muted">
-                Code : {reservationExistante.code}
-              </Text>
-            </View>
+            <Link href={`/reservation/${reservationExistante.id}`} asChild>
+              <Pressable className="rounded-xl border border-line bg-surface-sunken p-4 active:opacity-70">
+                <Text className="text-sm text-ink">
+                  Vous avez déjà réservé {reservationExistante.nombrePlaces} place
+                  {reservationExistante.nombrePlaces > 1 ? "s" : ""}.
+                </Text>
+                <Text className="mt-1 text-sm text-ink-muted">
+                  Code : {reservationExistante.code}
+                </Text>
+              </Pressable>
+            </Link>
           ) : complet ? (
             <View className="items-center rounded-xl bg-surface-sunken py-3">
               <Text className="text-base font-medium text-ink-muted">Complet</Text>
