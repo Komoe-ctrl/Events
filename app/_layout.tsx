@@ -48,6 +48,10 @@ export default function RootLayout() {
               options={{ title: "Publier un événement", headerBackTitle: "Retour" }}
             />
             <Stack.Screen
+              name="modifier-evenement/[id]"
+              options={{ title: "Modifier l'événement", headerBackTitle: "Retour" }}
+            />
+            <Stack.Screen
               name="moderation"
               options={{ title: "Modération", headerBackTitle: "Retour" }}
             />

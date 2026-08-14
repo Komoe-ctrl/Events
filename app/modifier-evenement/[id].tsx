@@ -1,29 +1,50 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { router } from "expo-router";
-import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import {
   FormulaireEvenement,
+  valeursDepuisEvenement,
   valeursVides,
   validerFormulaireEvenement,
   type ErreursFormulaireEvenement,
+  type ValeursFormulaireEvenement,
 } from "@/components/FormulaireEvenement";
-import { creerEvenement } from "@/features/events/api";
+import { modifierEvenement, recupererMesEvenements } from "@/features/events/api";
 import { ErreurApi, ErreurReseau } from "@/lib/apiClient";
+import { revenirOuAller } from "@/lib/navigation";
 
-export default function Publier() {
+export default function ModifierEvenement() {
+  const { id } = useLocalSearchParams<{ id: string }>();
   const queryClient = useQueryClient();
-  const [valeurs, setValeurs] = useState(valeursVides());
+
+  const { data, isPending, isError } = useQuery({
+    queryKey: ["evenements", "moi"],
+    queryFn: recupererMesEvenements,
+  });
+  const evenement = data?.find((e) => e.id === id);
+
+  const [valeurs, setValeurs] = useState<ValeursFormulaireEvenement>(valeursVides());
+  const [initialise, setInitialise] = useState(false);
   const [erreurs, setErreurs] = useState<ErreursFormulaireEvenement>({});
   const [erreurGenerale, setErreurGenerale] = useState<string | undefined>();
-  const [succes, setSucces] = useState(false);
+
+  // Pre-remplit une seule fois, quand l'evenement arrive — pas a chaque
+  // invalidation de ["evenements", "moi"], sinon les saisies en cours de
+  // l'utilisateur seraient ecrasees par le refetch declenche a la fin.
+  useEffect(() => {
+    if (evenement && !initialise) {
+      setValeurs(valeursDepuisEvenement(evenement));
+      setInitialise(true);
+    }
+  }, [evenement, initialise]);
 
   const mutation = useMutation({
-    mutationFn: creerEvenement,
+    mutationFn: (donnees: Parameters<typeof modifierEvenement>[1]) =>
+      modifierEvenement(id, donnees),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["evenements", "moi"] });
-      setSucces(true);
+      revenirOuAller("/mes-evenements");
     },
     onError: (erreur) => {
       setErreurGenerale(
@@ -42,21 +63,20 @@ export default function Publier() {
     mutation.mutate(resultat.donnees);
   };
 
-  if (succes) {
+  if (isPending || !initialise) {
+    return (
+      <View className="flex-1 items-center justify-center bg-surface">
+        <ActivityIndicator color="#D85314" />
+      </View>
+    );
+  }
+
+  if (isError || !evenement) {
     return (
       <View className="flex-1 items-center justify-center bg-surface px-8">
-        <Ionicons name="time-outline" size={48} color="#D85314" />
-        <Text className="mt-4 text-center text-lg font-medium text-ink">Événement soumis</Text>
-        <Text className="mt-2 text-center text-sm text-ink-muted">
-          Il est en attente de modération et ne sera visible publiquement qu'après validation
-          par un administrateur.
+        <Text className="text-center text-ink-muted">
+          {isError ? "Impossible de charger cet événement." : "Événement introuvable."}
         </Text>
-        <Pressable
-          onPress={() => router.push("/mes-evenements")}
-          className="mt-6 rounded-xl bg-brand-600 px-6 py-3 active:opacity-80"
-        >
-          <Text className="text-base font-medium text-white">Voir mes événements</Text>
-        </Pressable>
       </View>
     );
   }
@@ -77,7 +97,7 @@ export default function Publier() {
         {mutation.isPending ? (
           <ActivityIndicator color="#FFFFFF" />
         ) : (
-          <Text className="text-base font-medium text-white">Publier</Text>
+          <Text className="text-base font-medium text-white">Enregistrer les modifications</Text>
         )}
       </Pressable>
     </ScrollView>

@@ -38,3 +38,14 @@ export function construireDateIso(dateSaisie: string, heureSaisie: string): stri
 
   return iso;
 }
+
+/** Sens inverse, pour pre-remplir un formulaire d'edition depuis une date ISO existante. */
+export function decomposerDateIso(iso: string): { jour: string; heure: string } {
+  const date = new Date(iso);
+  const jour = String(date.getUTCDate()).padStart(2, "0");
+  const mois = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const annee = String(date.getUTCFullYear());
+  const heure = String(date.getUTCHours()).padStart(2, "0");
+  const minute = String(date.getUTCMinutes()).padStart(2, "0");
+  return { jour: `${jour}/${mois}/${annee}`, heure: `${heure}:${minute}` };
+}
