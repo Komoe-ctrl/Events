@@ -28,7 +28,7 @@ export default function DetailModeration() {
   // (GET /admin/evenements) donne deja l'evenement en entier, et la fiche
   // publique ne renvoie jamais un EN_ATTENTE (trouverPublicParId filtre sur
   // PUBLIE). Meme repli que modifier-evenement/[id].tsx.
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, error: erreurChargement } = useQuery({
     queryKey: ["evenements", "moderation"],
     queryFn: recupererEvenementsAModerer,
   });
@@ -60,12 +60,19 @@ export default function DetailModeration() {
   }
 
   if (isError || !evenement) {
+    // Meme logique que la liste : le masquage dans Profil n'est qu'une
+    // commodite d'UI, la vraie protection est le 403 ACCES_REFUSE du
+    // serveur — un non-admin qui atteint cette URL directement doit lire
+    // un refus explicite, pas un message qui laisse croire a une panne.
+    const accesRefuse = erreurChargement instanceof ErreurApi && erreurChargement.code === "ACCES_REFUSE";
     return (
       <View className="flex-1 items-center justify-center bg-surface px-8">
         <Text className="text-center text-ink-muted">
-          {isError
-            ? "Impossible de charger cet événement."
-            : "Événement introuvable ou déjà modéré."}
+          {accesRefuse
+            ? "Cet écran est réservé aux administrateurs."
+            : isError
+              ? "Impossible de charger cet événement."
+              : "Événement introuvable ou déjà modéré."}
         </Text>
       </View>
     );

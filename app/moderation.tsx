@@ -2,11 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "expo-router";
 import { ActivityIndicator, FlatList, Image, Pressable, Text, View } from "react-native";
 import { recupererEvenementsAModerer } from "@/features/events/api";
+import { ErreurApi } from "@/lib/apiClient";
 import { formaterDateEvenement } from "@/lib/date";
 import type { Evenement } from "@/types/event";
 
 export default function Moderation() {
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, error } = useQuery({
     queryKey: ["evenements", "moderation"],
     queryFn: recupererEvenementsAModerer,
   });
@@ -20,10 +21,18 @@ export default function Moderation() {
   }
 
   if (isError) {
+    // Le masquage de l'entree "Moderation" dans Profil (role !== ADMIN) n'est
+    // qu'une commodite d'UI, pas une protection — un PARTICIPANT qui
+    // atteindrait quand meme cette URL directement doit voir un refus
+    // propre et explicite, pas un message qui laisse croire a un probleme
+    // reseau. RolesGuard rejette avec ACCES_REFUSE (403) cote serveur.
+    const accesRefuse = error instanceof ErreurApi && error.code === "ACCES_REFUSE";
     return (
       <View className="flex-1 items-center justify-center bg-surface-sunken px-8">
         <Text className="text-center text-ink-muted">
-          Impossible de charger la file de modération. Vérifie ta connexion.
+          {accesRefuse
+            ? "Cet écran est réservé aux administrateurs."
+            : "Impossible de charger la file de modération. Vérifie ta connexion."}
         </Text>
       </View>
     );
