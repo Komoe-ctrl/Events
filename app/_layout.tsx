@@ -58,7 +58,15 @@ export default function RootLayout() {
             />
             <Stack.Screen
               name="reservation/[id]"
-              options={{ title: "", headerBackTitle: "Retour" }}
+              options={{
+                title: "",
+                headerBackTitle: "Retour",
+                // L'ecran est sur fond sombre (billet lu dans le noir a
+                // l'entree) : l'entete doit suivre, sinon la bascule
+                // clair/sombre entre entete et contenu casse la coherence.
+                headerStyle: { backgroundColor: "#1A1410" },
+                headerTintColor: "#FFFFFF",
+              }}
             />
             <Stack.Screen
               name="mes-evenements"
