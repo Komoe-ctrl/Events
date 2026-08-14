@@ -255,7 +255,7 @@ export default function Scanner() {
           </Text>
         )}
         <Pressable onPress={() => setMode("manuel")} className="mt-3 items-center py-2">
-          <Text className="text-sm font-medium text-brand-600">Saisir le code à la main</Text>
+          <Text className="text-sm font-medium text-ink underline">Saisir le code à la main</Text>
         </Pressable>
       </View>
     </View>

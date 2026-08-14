@@ -113,7 +113,7 @@ export default function FicheEvenement() {
             l'ecran vedette du produit doit rester coherent avec la carte qui
             y mene. */}
         <View className="absolute inset-x-0 top-0 flex-row items-start justify-between p-4">
-          <Text className="overflow-hidden rounded-chip bg-brand-500 px-2 py-1 text-label font-bold uppercase text-white">
+          <Text className="overflow-hidden rounded-chip bg-ink px-2 py-1 text-label font-bold uppercase text-white">
             {LIBELLES_CATEGORIE[data.categorie] ?? data.categorie}
           </Text>
           <Text className="overflow-hidden rounded-chip bg-accent px-2 py-1 text-label font-bold uppercase text-accent-ink">
@@ -125,7 +125,9 @@ export default function FicheEvenement() {
         <Text className="font-display text-display-lg leading-[36px] text-ink">
           {data.titre}
         </Text>
-        <Text className="mt-2 text-sm font-medium text-brand-600">
+        {/* Texte explicatif, pas une action : encre sombre plutot
+            qu'orange (regle de discipline couleur). */}
+        <Text className="mt-2 text-sm font-medium text-ink-muted">
           {formaterDateEvenement(data.dateDebut)}
           {data.dateFin ? ` → ${formaterDateEvenement(data.dateFin)}` : ""}
         </Text>
@@ -137,12 +139,15 @@ export default function FicheEvenement() {
         <View className="mt-6">
           {reservationExistante ? (
             <Link href={`/reservation/${reservationExistante.id}`} asChild>
-              <Pressable className="rounded-card bg-brand-50 p-4 active:opacity-70">
-                <Text className="text-sm text-ink">
+              {/* Confirmation, pas une action : palette semantique verte
+                  (etat "actif/valide"), distincte de l'accent orange —
+                  meme famille que le badge CONFIRMEE. */}
+              <Pressable className="rounded-card bg-green-50 p-4 active:opacity-70">
+                <Text className="text-sm text-green-800">
                   Vous avez déjà réservé {reservationExistante.nombrePlaces} place
                   {reservationExistante.nombrePlaces > 1 ? "s" : ""}.
                 </Text>
-                <Text className="mt-1 text-sm text-ink-muted">
+                <Text className="mt-1 text-sm text-green-700">
                   Code : {reservationExistante.code}
                 </Text>
               </Pressable>

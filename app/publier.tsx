@@ -45,7 +45,9 @@ export default function Publier() {
   if (succes) {
     return (
       <View className="flex-1 items-center justify-center bg-surface px-8">
-        <Ionicons name="time-outline" size={48} color="#FF6B00" />
+        {/* Icone d'etat "en attente", pas une action : meme couleur que le
+            badge EN_ATTENTE (amber-600), pas l'accent orange. */}
+        <Ionicons name="time-outline" size={48} color="#B45309" />
         <Text className="mt-4 text-center text-lg font-medium text-ink">Événement soumis</Text>
         <Text className="mt-2 text-center text-sm text-ink-muted">
           Il est en attente de modération et ne sera visible publiquement qu'après validation

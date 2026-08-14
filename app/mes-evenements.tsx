@@ -63,10 +63,13 @@ function CarteEvenementOrganisateur({ evenement }: { evenement: Evenement }) {
       </Text>
       <View className="mt-2 flex-row items-center justify-between">
         <BadgeStatut statut={evenement.statut} />
+        {/* Affordance de ligne, pas l'action primaire de l'ecran (celle-ci
+            est "Publier un evenement", dans Profil) : encre attenuee plutot
+            qu'orange repete sur chaque ligne de liste. */}
         {modifiable ? (
-          <Text className="text-sm font-medium text-brand-600">Modifier</Text>
+          <Text className="text-sm font-medium text-ink-muted">Modifier</Text>
         ) : evenement.statut === "PUBLIE" ? (
-          <Text className="text-sm font-medium text-brand-600">Voir les inscrits</Text>
+          <Text className="text-sm font-medium text-ink-muted">Voir les inscrits</Text>
         ) : null}
       </View>
       {evenement.statut === "REFUSE" && evenement.motifRefus ? (
@@ -97,7 +100,10 @@ function CarteEvenementOrganisateur({ evenement }: { evenement: Evenement }) {
 function BadgeStatut({ statut }: { statut: StatutEvenement }) {
   const styles: Record<StatutEvenement, { classe: string; libelle: string }> = {
     BROUILLON: { classe: "bg-surface-sunken text-ink-faint", libelle: "Brouillon" },
-    EN_ATTENTE: { classe: "bg-brand-50 text-brand-700", libelle: "En attente de modération" },
+    // Palette semantique distincte de l'accent : chaque statut a sa propre
+    // famille de couleur, aucune ne recycle l'orange (regle de discipline
+    // couleur).
+    EN_ATTENTE: { classe: "bg-amber-50 text-amber-700", libelle: "En attente de modération" },
     PUBLIE: { classe: "bg-green-50 text-green-700", libelle: "Publié" },
     REFUSE: { classe: "bg-red-50 text-red-700", libelle: "Refusé" },
   };

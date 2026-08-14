@@ -121,7 +121,7 @@ export default function Inscription() {
         )}
       </Pressable>
 
-      <Link href="/connexion" replace className="mt-4 text-center text-sm text-brand-600">
+      <Link href="/connexion" replace className="mt-4 text-center text-sm text-ink underline">
         Déjà un compte ? Se connecter
       </Link>
     </ScrollView>
