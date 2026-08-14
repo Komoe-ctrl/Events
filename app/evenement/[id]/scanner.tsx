@@ -88,7 +88,13 @@ const PRESENTATION: Record<
   },
 };
 
-function CarteResultat({ resultat }: { resultat: Resultat }) {
+function CarteResultat({
+  resultat,
+  onReessayer,
+}: {
+  resultat: Resultat;
+  onReessayer: () => void;
+}) {
   if (resultat.type === "succes") {
     return (
       <View className="mt-4 items-center rounded-xl border border-green-200 bg-green-50 p-6">
@@ -109,6 +115,14 @@ function CarteResultat({ resultat }: { resultat: Resultat }) {
       <Text className={`mt-2 text-lg font-semibold ${classeTexte}`}>{titre}</Text>
       {resultat.type === "inconnu" ? (
         <Text className={`mt-1 text-sm ${classeTexte}`}>{resultat.message}</Text>
+      ) : null}
+      {resultat.type === "reseau" ? (
+        <Pressable
+          onPress={onReessayer}
+          className="mt-4 rounded-lg border border-line bg-surface px-4 py-2 active:opacity-70"
+        >
+          <Text className="text-sm font-medium text-ink">Réessayer</Text>
+        </Pressable>
       ) : null}
     </View>
   );
@@ -164,7 +178,12 @@ export default function Scanner() {
         )}
       </Pressable>
 
-      {resultat ? <CarteResultat resultat={resultat} /> : null}
+      {resultat ? (
+        <CarteResultat
+          resultat={resultat}
+          onReessayer={() => mutation.mutate(code.trim().toUpperCase())}
+        />
+      ) : null}
     </View>
   );
 }
