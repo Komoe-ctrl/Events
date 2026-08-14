@@ -73,7 +73,9 @@ export default function FicheEvenement() {
   if (isPending) {
     return (
       <View className="flex-1 items-center justify-center bg-surface">
-        <ActivityIndicator color="#FF6B00" />
+        {/* brand-700, pas brand-500 : #FF6B00 direct sur fond clair ne
+            tient que 2.66:1 (mesure), sous le seuil non-textuel de 3:1. */}
+        <ActivityIndicator color="#B84800" />
       </View>
     );
   }
@@ -193,9 +195,9 @@ export default function FicheEvenement() {
                 className="items-center rounded-card bg-brand-500 py-3.5 active:opacity-80 disabled:opacity-50"
               >
                 {mutationReservation.isPending ? (
-                  <ActivityIndicator color="#FFFFFF" />
+                  <ActivityIndicator color="#1A1410" />
                 ) : (
-                  <Text className="font-display text-display-sm uppercase tracking-wide text-white">
+                  <Text className="font-display text-display-sm uppercase tracking-wide text-ink">
                     Réserver
                   </Text>
                 )}

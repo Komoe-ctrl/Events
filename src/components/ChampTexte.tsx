@@ -13,7 +13,7 @@ export function ChampTexte({ label, erreur, ...proprietesInput }: Props) {
         className={`rounded-xl border px-4 py-3 text-base text-ink ${
           erreur ? "border-red-400" : "border-line"
         }`}
-        placeholderTextColor="#A19B95"
+        placeholderTextColor="#6B6560"
         {...proprietesInput}
       />
       {erreur ? <Text className="mt-1 text-sm text-red-600">{erreur}</Text> : null}

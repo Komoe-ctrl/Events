@@ -204,9 +204,9 @@ export default function Scanner() {
         className="items-center rounded-card bg-brand-500 py-3 active:opacity-80 disabled:opacity-50"
       >
         {mutation.isPending ? (
-          <ActivityIndicator color="#FFFFFF" />
+          <ActivityIndicator color="#1A1410" />
         ) : (
-          <Text className="text-base font-medium text-white">Valider</Text>
+          <Text className="text-base font-medium text-ink">Valider</Text>
         )}
       </Pressable>
 
@@ -246,7 +246,7 @@ export default function Scanner() {
               onPress={() => setResultat(null)}
               className="mt-3 items-center rounded-card bg-brand-500 py-3 active:opacity-80"
             >
-              <Text className="text-base font-medium text-white">Scanner à nouveau</Text>
+              <Text className="text-base font-medium text-ink">Scanner à nouveau</Text>
             </Pressable>
           </>
         ) : (

@@ -24,7 +24,11 @@ module.exports = {
         ink: {
           DEFAULT: "#1A1410",
           muted: "#5C5248",
-          faint: "#948A7E",
+          // #948A7E ne passait pas 4.5:1 sur surface-sunken (3.16:1 mesure) —
+          // assombri pour rester lisible en plein soleil. C'est la cause du
+          // texte "ocre clair" repere sur l'onglet Carte (tabBarInactiveTintColor)
+          // et le placeholder des champs de formulaire.
+          faint: "#6B6560",
         },
         // Papier chaud, pas blanc pur : evite le "carte produit" generique.
         surface: {
