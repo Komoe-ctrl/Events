@@ -9,7 +9,7 @@ export default function Profil() {
   if (etat.statut === "chargement") {
     return (
       <View className="flex-1 items-center justify-center bg-surface-sunken">
-        <ActivityIndicator color="#D85314" />
+        <ActivityIndicator color="#FF6B00" />
       </View>
     );
   }
@@ -22,7 +22,7 @@ export default function Profil() {
         </Text>
         <Pressable
           onPress={() => router.push("/connexion")}
-          className="rounded-xl bg-brand-600 px-6 py-3 active:opacity-80"
+          className="rounded-card bg-brand-500 px-6 py-3 active:opacity-80"
         >
           <Text className="text-base font-medium text-white">Se connecter</Text>
         </Pressable>
@@ -34,7 +34,7 @@ export default function Profil() {
 
   return (
     <ScrollView className="flex-1 bg-surface-sunken" contentContainerClassName="p-6">
-      <View className="mb-6 rounded-2xl border border-line bg-surface p-5">
+      <View className="mb-6 rounded-card bg-surface p-5">
         <Text className="text-lg font-medium text-ink">{utilisateur.nom}</Text>
         <Text className="mt-1 text-sm text-ink-muted">{utilisateur.telephone}</Text>
       </View>
@@ -52,7 +52,7 @@ export default function Profil() {
 
       <Pressable
         onPress={() => deconnexion()}
-        className="mt-6 items-center rounded-xl border border-line py-3 active:opacity-70"
+        className="mt-6 items-center rounded-card border border-line py-3 active:opacity-70"
       >
         <Text className="text-base font-medium text-ink">Se déconnecter</Text>
       </Pressable>
@@ -71,12 +71,12 @@ function EntreeMenu({
 }) {
   return (
     <Link href={href} asChild>
-      <Pressable className="mb-3 flex-row items-center justify-between rounded-xl border border-line bg-surface px-4 py-4 active:opacity-70">
+      <Pressable className="mb-3 flex-row items-center justify-between rounded-card bg-surface px-4 py-4 active:opacity-70">
         <View className="flex-row items-center gap-3">
-          <Ionicons name={icone} size={20} color="#6B6560" />
+          <Ionicons name={icone} size={20} color="#5C5248" />
           <Text className="text-base text-ink">{titre}</Text>
         </View>
-        <Ionicons name="chevron-forward" size={18} color="#A19B95" />
+        <Ionicons name="chevron-forward" size={18} color="#948A7E" />
       </Pressable>
     </Link>
   );

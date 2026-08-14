@@ -66,7 +66,7 @@ export default function ModifierEvenement() {
   if (isPending || !initialise) {
     return (
       <View className="flex-1 items-center justify-center bg-surface">
-        <ActivityIndicator color="#D85314" />
+        <ActivityIndicator color="#FF6B00" />
       </View>
     );
   }
@@ -92,7 +92,7 @@ export default function ModifierEvenement() {
       <Pressable
         onPress={soumettre}
         disabled={mutation.isPending}
-        className="items-center rounded-xl bg-brand-600 py-3 active:opacity-80 disabled:opacity-50"
+        className="items-center rounded-card bg-brand-500 py-3 active:opacity-80 disabled:opacity-50"
       >
         {mutation.isPending ? (
           <ActivityIndicator color="#FFFFFF" />

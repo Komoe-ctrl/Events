@@ -43,10 +43,10 @@ export function ChampLieu({ valeur, onChange, erreurs }: Props) {
       <Pressable
         onPress={utiliserPositionActuelle}
         disabled={etat.statut === "chargement"}
-        className="mb-4 items-center rounded-xl border border-line py-3 active:opacity-70 disabled:opacity-50"
+        className="mb-4 items-center rounded-card border border-line py-3 active:opacity-70 disabled:opacity-50"
       >
         {etat.statut === "chargement" ? (
-          <ActivityIndicator color="#6B6560" />
+          <ActivityIndicator color="#5C5248" />
         ) : (
           <Text className="text-base font-medium text-ink">Utiliser ma position actuelle</Text>
         )}

@@ -54,7 +54,7 @@ export default function Connexion() {
 
   return (
     <ScrollView className="flex-1 bg-surface" contentContainerClassName="p-6">
-      <Text className="mb-6 text-2xl font-medium text-ink">Connexion</Text>
+      <Text className="mb-6 font-display text-display text-ink">Connexion</Text>
 
       <ChampTexte
         label="Numéro de téléphone"
@@ -78,7 +78,7 @@ export default function Connexion() {
       <Pressable
         onPress={soumettre}
         disabled={enCours}
-        className="items-center rounded-xl bg-brand-600 py-3 active:opacity-80 disabled:opacity-50"
+        className="items-center rounded-card bg-brand-500 py-3 active:opacity-80 disabled:opacity-50"
       >
         {enCours ? (
           <ActivityIndicator color="#FFFFFF" />

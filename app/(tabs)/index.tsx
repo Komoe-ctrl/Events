@@ -21,7 +21,7 @@ export default function AutourDeMoi() {
   if (isPending) {
     return (
       <View className="flex-1 items-center justify-center bg-surface-sunken">
-        <ActivityIndicator color="#D85314" />
+        <ActivityIndicator color="#FF6B00" />
       </View>
     );
   }
@@ -45,8 +45,8 @@ export default function AutourDeMoi() {
       renderItem={({ item }) => <CarteEvenement evenement={item} />}
       ListHeaderComponent={
         position.statut === "refuse" ? (
-          <View className="mb-4 rounded-xl bg-brand-50 p-4">
-            <Text className="text-sm text-brand-700">
+          <View className="mb-3 rounded-card bg-brand-500 px-4 py-3">
+            <Text className="text-sm font-medium text-white">
               Active la localisation pour trier les événements par distance.
             </Text>
           </View>

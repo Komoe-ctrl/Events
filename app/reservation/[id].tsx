@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import { ActivityIndicator, Modal, Pressable, Text, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
@@ -44,7 +45,7 @@ export default function DetailReservation() {
   if (enLigne.isPending && enCache.isPending) {
     return (
       <View className="flex-1 items-center justify-center bg-surface">
-        <ActivityIndicator color="#D85314" />
+        <ActivityIndicator color="#FF6B00" />
       </View>
     );
   }
@@ -63,11 +64,21 @@ export default function DetailReservation() {
   }
 
   return (
-    <View className="flex-1 bg-surface p-6">
+    // Fond sombre volontaire, pas un oubli de theme : cet ecran est concu
+    // pour etre brandi a l'entree d'une salle, souvent dans le noir. Un
+    // rectangle blanc pur sur fond sombre est ce qui se repere le plus vite
+    // par l'organisateur qui scanne, et evite d'eblouir en plein ecran
+    // blanc. Le QR et le code de secours restent en blanc/noir purs, jamais
+    // teintes par la palette — la lisibilite prime sur l'identite visuelle
+    // ici precisement.
+    <View className="flex-1 bg-ink p-6">
+      <StatusBar style="light" />
       {reservation.evenement ? (
         <View>
-          <Text className="text-xl font-medium text-ink">{reservation.evenement.titre}</Text>
-          <Text className="mt-1 text-sm text-ink-muted">
+          <Text className="font-display text-display text-white">
+            {reservation.evenement.titre}
+          </Text>
+          <Text className="mt-1 text-sm text-white/60">
             {formaterDateEvenement(reservation.evenement.dateDebut)} ·{" "}
             {reservation.evenement.commune}
           </Text>
@@ -75,13 +86,13 @@ export default function DetailReservation() {
       ) : null}
 
       <View className="mt-8 items-center">
-        <View className="rounded-2xl border border-line p-4">
-          <QRCode value={reservation.code} size={200} />
+        <View className="rounded-card bg-white p-4">
+          <QRCode value={reservation.code} size={220} />
         </View>
-        <Text className="mt-4 text-3xl font-semibold tracking-widest text-ink">
+        <Text className="mt-5 text-center font-display text-display-lg tracking-[6px] text-white">
           {reservation.code}
         </Text>
-        <Text className="mt-2 text-sm text-ink-muted">
+        <Text className="mt-2 text-sm text-white/60">
           {reservation.nombrePlaces} place{reservation.nombrePlaces > 1 ? "s" : ""}
         </Text>
       </View>
@@ -91,16 +102,16 @@ export default function DetailReservation() {
           <Pressable
             onPress={() => setConfirmationVisible(true)}
             disabled={mutationAnnulation.isPending}
-            className="items-center rounded-xl border border-line py-3 active:opacity-70 disabled:opacity-50"
+            className="items-center rounded-card border border-white/20 py-3 active:opacity-70 disabled:opacity-50"
           >
             {mutationAnnulation.isPending ? (
-              <ActivityIndicator color="#6B6560" />
+              <ActivityIndicator color="#FFFFFF" />
             ) : (
-              <Text className="text-base font-medium text-ink">Annuler la réservation</Text>
+              <Text className="text-base font-medium text-white/80">Annuler la réservation</Text>
             )}
           </Pressable>
           {mutationAnnulation.isError ? (
-            <Text className="mt-2 text-center text-sm text-red-600">
+            <Text className="mt-2 text-center text-sm text-red-400">
               {mutationAnnulation.error instanceof ErreurApi
                 ? mutationAnnulation.error.message
                 : "Impossible d'annuler. Vérifie ta connexion."}
@@ -122,7 +133,7 @@ export default function DetailReservation() {
         onRequestClose={() => setConfirmationVisible(false)}
       >
         <View className="flex-1 items-center justify-center bg-black/40 p-6">
-          <View className="w-full max-w-sm rounded-2xl bg-surface p-5">
+          <View className="w-full max-w-sm rounded-card bg-surface p-5">
             <Text className="text-lg font-medium text-ink">Annuler la réservation ?</Text>
             <Text className="mt-2 text-sm text-ink-muted">
               Vous pourrez réserver à nouveau si vous changez d'avis.
@@ -130,7 +141,7 @@ export default function DetailReservation() {
             <View className="mt-5 flex-row justify-end gap-3">
               <Pressable
                 onPress={() => setConfirmationVisible(false)}
-                className="rounded-lg px-4 py-2 active:opacity-70"
+                className="rounded-chip px-4 py-2 active:opacity-70"
               >
                 <Text className="text-base text-ink">Non</Text>
               </Pressable>
@@ -139,7 +150,7 @@ export default function DetailReservation() {
                   setConfirmationVisible(false);
                   mutationAnnulation.mutate();
                 }}
-                className="rounded-lg bg-red-600 px-4 py-2 active:opacity-80"
+                className="rounded-chip bg-red-600 px-4 py-2 active:opacity-80"
               >
                 <Text className="text-base font-medium text-white">
                   Annuler la réservation

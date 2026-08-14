@@ -1,8 +1,11 @@
 import "../global.css";
 
+import { Anton_400Regular, useFonts } from "@expo-google-fonts/anton";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { definirLecteurJeton } from "@/lib/apiClient";
 import { lireJeton } from "@/lib/authStorage";
@@ -11,7 +14,25 @@ import { AuthProvider } from "@/features/auth/AuthContext";
 
 definirLecteurJeton(lireJeton);
 
+// Ecran natif tenu ouvert le temps du chargement d'Anton (police des
+// titres) : sans ca, un premier rendu avec la police systeme apparaitrait
+// une fraction de seconde avant de basculer sur Anton, visible au demarrage
+// a froid.
+SplashScreen.preventAutoHideAsync();
+
 export default function RootLayout() {
+  const [policesChargees, erreurPolices] = useFonts({ Anton_400Regular });
+
+  useEffect(() => {
+    if (policesChargees || erreurPolices) {
+      SplashScreen.hideAsync();
+    }
+  }, [policesChargees, erreurPolices]);
+
+  if (!policesChargees && !erreurPolices) {
+    return null;
+  }
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
@@ -37,7 +58,15 @@ export default function RootLayout() {
             />
             <Stack.Screen
               name="reservation/[id]"
-              options={{ title: "", headerBackTitle: "Retour" }}
+              options={{
+                title: "",
+                headerBackTitle: "Retour",
+                // L'ecran est sur fond sombre (billet lu dans le noir a
+                // l'entree) : l'entete doit suivre, sinon la bascule
+                // clair/sombre entre entete et contenu casse la coherence.
+                headerStyle: { backgroundColor: "#1A1410" },
+                headerTintColor: "#FFFFFF",
+              }}
             />
             <Stack.Screen
               name="mes-evenements"
