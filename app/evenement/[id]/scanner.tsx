@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import { useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { ChampTexte } from "@/components/ChampTexte";
@@ -130,9 +131,14 @@ function CarteResultat({
 
 export default function Scanner() {
   const queryClient = useQueryClient();
+  const [mode, setMode] = useState<"manuel" | "camera">("manuel");
   const [code, setCode] = useState("");
+  const [dernierCodeTente, setDernierCodeTente] = useState("");
   const [resultat, setResultat] = useState<Resultat | null>(null);
+  const [permission, demanderPermission] = useCameraPermissions();
 
+  // Chemin de validation unique, partage entre saisie manuelle et camera —
+  // seule la source du code change, jamais la logique qui le traite.
   const mutation = useMutation({
     mutationFn: (code: string) => validerReservation(code),
     onSuccess: (reservation) => {
@@ -147,16 +153,42 @@ export default function Scanner() {
     },
   });
 
+  const soumettreCode = (valeur: string) => {
+    const nettoye = valeur.trim().toUpperCase();
+    setDernierCodeTente(nettoye);
+    setResultat(null);
+    mutation.mutate(nettoye);
+  };
+
   const valider = () => {
     if (code.trim().length === 0) {
       setResultat({ type: "inconnu", message: "Entre un code." });
       return;
     }
-    setResultat(null);
-    mutation.mutate(code.trim().toUpperCase());
+    soumettreCode(code);
   };
 
-  return (
+  // Un QR reste dans le cadre plusieurs frames de suite : sans garde,
+  // onBarcodeScanned rappellerait soumettreCode() en boucle pour le meme
+  // code tant qu'il est visible. Une fois qu'un resultat est affiche (succes
+  // ou erreur), la camera cesse d'etre ecoutee jusqu'a ce que l'utilisateur
+  // tape explicitement "Scanner a nouveau" (qui remet resultat a null).
+  const gererCodeScanne = ({ data }: { data: string }) => {
+    if (mutation.isPending || resultat) return;
+    soumettreCode(data);
+  };
+
+  const passerEnModeCamera = async () => {
+    const reponse = permission?.granted ? permission : await demanderPermission();
+    if (reponse.granted) {
+      setResultat(null);
+      setMode("camera");
+    }
+    // Refus : on reste simplement en mode manuel (deja affiche par defaut),
+    // jamais d'ecran camera bloque ou vide a la place.
+  };
+
+  const formulaireManuel = (
     <View className="flex-1 bg-surface p-6">
       <ChampTexte
         label="Code de la réservation"
@@ -178,12 +210,54 @@ export default function Scanner() {
         )}
       </Pressable>
 
+      <Pressable
+        onPress={passerEnModeCamera}
+        className="mt-3 items-center rounded-xl border border-line py-3 active:opacity-70"
+      >
+        <Text className="text-base font-medium text-ink">Scanner avec la caméra</Text>
+      </Pressable>
+
       {resultat ? (
-        <CarteResultat
-          resultat={resultat}
-          onReessayer={() => mutation.mutate(code.trim().toUpperCase())}
-        />
+        <CarteResultat resultat={resultat} onReessayer={() => soumettreCode(dernierCodeTente)} />
       ) : null}
+    </View>
+  );
+
+  if (mode === "manuel") {
+    return formulaireManuel;
+  }
+
+  return (
+    <View className="flex-1 bg-surface">
+      <CameraView
+        style={{ flex: 1 }}
+        facing="back"
+        barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+        onBarcodeScanned={gererCodeScanne}
+      />
+      <View className="bg-surface p-6">
+        {resultat ? (
+          <>
+            <CarteResultat
+              resultat={resultat}
+              onReessayer={() => soumettreCode(dernierCodeTente)}
+            />
+            <Pressable
+              onPress={() => setResultat(null)}
+              className="mt-3 items-center rounded-xl bg-brand-600 py-3 active:opacity-80"
+            >
+              <Text className="text-base font-medium text-white">Scanner à nouveau</Text>
+            </Pressable>
+          </>
+        ) : (
+          <Text className="text-center text-sm text-ink-muted">
+            Cadre le QR code du billet.
+          </Text>
+        )}
+        <Pressable onPress={() => setMode("manuel")} className="mt-3 items-center py-2">
+          <Text className="text-sm font-medium text-brand-600">Saisir le code à la main</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
