@@ -63,7 +63,7 @@ export default function MesReservations() {
       sections={sections}
       keyExtractor={(item) => item.id}
       renderSectionHeader={({ section }) => (
-        <Text className="mb-2 mt-4 text-sm font-medium uppercase text-ink-faint">
+        <Text className="mb-2 mt-4 text-sm font-medium uppercase text-ink-muted">
           {section.title}
         </Text>
       )}
