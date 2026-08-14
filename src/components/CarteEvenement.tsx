@@ -2,7 +2,7 @@ import { Link } from "expo-router";
 import { Image } from "expo-image";
 import { Pressable, Text, View } from "react-native";
 import { formaterDistance } from "@/lib/distance";
-import type { EvenementAvecDistance } from "@/types/event";
+import type { Evenement } from "@/types/event";
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString("fr-FR", {
@@ -13,7 +13,7 @@ const formatDate = (iso: string) =>
     minute: "2-digit",
   });
 
-export function CarteEvenement({ evenement }: { evenement: EvenementAvecDistance }) {
+export function CarteEvenement({ evenement }: { evenement: Evenement }) {
   return (
     <Link href={`/evenement/${evenement.id}`} asChild>
       <Pressable className="mb-4 overflow-hidden rounded-2xl border border-line bg-surface active:opacity-80">
@@ -33,7 +33,7 @@ export function CarteEvenement({ evenement }: { evenement: EvenementAvecDistance
           <View className="mt-3 flex-row items-center justify-between">
             <Text className="text-sm text-ink-faint">
               {evenement.commune}
-              {evenement.distanceKm !== null
+              {evenement.distanceKm !== undefined
                 ? ` · ${formaterDistance(evenement.distanceKm)}`
                 : ""}
             </Text>

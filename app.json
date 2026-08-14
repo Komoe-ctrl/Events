@@ -45,7 +45,8 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Alentour utilise ta position pour te montrer les événements les plus proches de toi."
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
