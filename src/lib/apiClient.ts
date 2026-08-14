@@ -35,6 +35,19 @@ export function definirLecteurJeton(lecteur: () => Promise<string | null>): void
   lireJetonActuel = lecteur;
 }
 
+/**
+ * Meme patron que le lecteur de jeton ci-dessus, meme raison : le client ne
+ * doit pas dependre d'AuthContext (React). Declenche quand une requete
+ * envoyee AVEC un jeton recoit un 401 — un jeton invalide/expire, pas une
+ * simple absence de jeton ni un 403 (role insuffisant, pas un probleme de
+ * session). Voir l'etape 5 de la conversation pour la justification complete.
+ */
+let gestionnaireSessionExpiree: (() => void) | null = null;
+
+export function definirGestionnaireSessionExpiree(gestionnaire: () => void): void {
+  gestionnaireSessionExpiree = gestionnaire;
+}
+
 type MethodeHttp = "GET" | "POST" | "PATCH" | "DELETE";
 
 type OptionsAppel = {
@@ -97,6 +110,9 @@ export async function appelApi<T>(chemin: string, options: OptionsAppel = {}): P
   }
 
   if (!reponse.ok) {
+    if (reponse.status === 401 && jeton) {
+      gestionnaireSessionExpiree?.();
+    }
     if (estErreurApplicative(donnees)) {
       throw new ErreurApi(donnees.erreur.code, donnees.erreur.message, reponse.status);
     }

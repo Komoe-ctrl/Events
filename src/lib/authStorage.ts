@@ -1,5 +1,7 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import type { Utilisateur } from "@/types/utilisateur";
 
 /**
  * Le jeton JWT va dans SecureStore (chiffre, natif), jamais AsyncStorage —
@@ -36,4 +38,28 @@ export async function supprimerJeton(): Promise<void> {
     return;
   }
   await SecureStore.deleteItemAsync(CLE_JETON);
+}
+
+/**
+ * L'API n'expose aucun endpoint pour retrouver l'utilisateur courant a
+ * partir du seul jeton (le payload JWT ne porte que sub/telephone/role, pas
+ * le nom — voir alentour-api/src/auth/strategies/jwt.strategy.ts). Pour
+ * restaurer la session au demarrage sans appel reseau, on persiste donc
+ * aussi le profil utilisateur recu a la connexion/inscription. Donnee non
+ * sensible (deja visible par l'utilisateur lui-meme) : AsyncStorage, pas
+ * SecureStore.
+ */
+const CLE_UTILISATEUR = "alentour.utilisateur";
+
+export async function lireUtilisateur(): Promise<Utilisateur | null> {
+  const brut = await AsyncStorage.getItem(CLE_UTILISATEUR);
+  return brut ? (JSON.parse(brut) as Utilisateur) : null;
+}
+
+export async function ecrireUtilisateur(utilisateur: Utilisateur): Promise<void> {
+  await AsyncStorage.setItem(CLE_UTILISATEUR, JSON.stringify(utilisateur));
+}
+
+export async function supprimerUtilisateur(): Promise<void> {
+  await AsyncStorage.removeItem(CLE_UTILISATEUR);
 }
