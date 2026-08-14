@@ -63,7 +63,11 @@ function CarteEvenementOrganisateur({ evenement }: { evenement: Evenement }) {
       </Text>
       <View className="mt-2 flex-row items-center justify-between">
         <BadgeStatut statut={evenement.statut} />
-        {modifiable ? <Text className="text-sm font-medium text-brand-600">Modifier</Text> : null}
+        {modifiable ? (
+          <Text className="text-sm font-medium text-brand-600">Modifier</Text>
+        ) : evenement.statut === "PUBLIE" ? (
+          <Text className="text-sm font-medium text-brand-600">Voir les inscrits</Text>
+        ) : null}
       </View>
       {evenement.statut === "REFUSE" && evenement.motifRefus ? (
         <Text className="mt-2 text-sm text-red-600">Motif : {evenement.motifRefus}</Text>
@@ -81,7 +85,7 @@ function CarteEvenementOrganisateur({ evenement }: { evenement: Evenement }) {
 
   if (evenement.statut === "PUBLIE") {
     return (
-      <Link href={`/evenement/${evenement.id}`} asChild>
+      <Link href={`/evenement/${evenement.id}/inscrits`} asChild>
         <Pressable className="active:opacity-70">{contenu}</Pressable>
       </Link>
     );
