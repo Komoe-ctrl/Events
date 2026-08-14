@@ -1,17 +1,9 @@
 import { Link } from "expo-router";
 import { Image } from "expo-image";
 import { Pressable, Text, View } from "react-native";
+import { formaterDateEvenement } from "@/lib/date";
 import { formaterDistance } from "@/lib/distance";
 import type { Evenement } from "@/types/event";
-
-const formatDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("fr-FR", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 
 export function CarteEvenement({ evenement }: { evenement: Evenement }) {
   return (
@@ -28,7 +20,7 @@ export function CarteEvenement({ evenement }: { evenement: Evenement }) {
             {evenement.titre}
           </Text>
           <Text className="mt-1 text-sm text-ink-muted">
-            {formatDate(evenement.dateDebut)}
+            {formaterDateEvenement(evenement.dateDebut)}
           </Text>
           <View className="mt-3 flex-row items-center justify-between">
             <Text className="text-sm text-ink-faint">
