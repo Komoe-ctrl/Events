@@ -9,7 +9,7 @@ import type { ReservationOrganisateur } from "@/types/reservation";
 function BoutonValiderBillet({ evenementId }: { evenementId: string }) {
   return (
     <Link href={`/evenement/${evenementId}/scanner`} asChild>
-      <Pressable className="mb-4 items-center rounded-xl bg-brand-600 py-3 active:opacity-80">
+      <Pressable className="mb-4 items-center rounded-card bg-brand-500 py-3 active:opacity-80">
         <Text className="text-base font-medium text-white">Valider un billet</Text>
       </Pressable>
     </Link>
@@ -24,7 +24,7 @@ function ResumeCapacite({
   capacite: number | null;
 }) {
   return (
-    <View className="mb-4 rounded-xl border border-line bg-surface p-4">
+    <View className="mb-4 rounded-card bg-surface p-4">
       <Text className="text-base font-medium text-ink">
         {capacite === null
           ? `${placesPrises} place${placesPrises > 1 ? "s" : ""} réservée${placesPrises > 1 ? "s" : ""}`
@@ -54,7 +54,7 @@ export default function Inscrits() {
   if (isPending) {
     return (
       <View className="flex-1 items-center justify-center bg-surface-sunken">
-        <ActivityIndicator color="#D85314" />
+        <ActivityIndicator color="#FF6B00" />
       </View>
     );
   }
@@ -112,7 +112,7 @@ export default function Inscrits() {
 
 function LigneInscrit({ reservation }: { reservation: ReservationOrganisateur }) {
   return (
-    <View className="mb-3 rounded-xl border border-line bg-surface p-4">
+    <View className="mb-3 rounded-card bg-surface p-4">
       <Text className="text-base font-medium text-ink">{reservation.utilisateur.nom}</Text>
       <Text className="mt-1 text-sm text-ink-muted">{reservation.utilisateur.telephone}</Text>
       <View className="mt-2 flex-row items-center justify-between">

@@ -14,7 +14,7 @@ export default function MesEvenements() {
   if (isPending) {
     return (
       <View className="flex-1 items-center justify-center bg-surface-sunken">
-        <ActivityIndicator color="#D85314" />
+        <ActivityIndicator color="#FF6B00" />
       </View>
     );
   }
@@ -54,7 +54,7 @@ function CarteEvenementOrganisateur({ evenement }: { evenement: Evenement }) {
   const modifiable = evenement.statut === "BROUILLON" || evenement.statut === "EN_ATTENTE";
 
   const contenu = (
-    <View className="mb-3 rounded-xl border border-line bg-surface p-4">
+    <View className="mb-3 rounded-card bg-surface p-4">
       <Text className="text-base font-medium text-ink" numberOfLines={2}>
         {evenement.titre}
       </Text>

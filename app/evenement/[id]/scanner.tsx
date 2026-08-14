@@ -98,7 +98,7 @@ function CarteResultat({
 }) {
   if (resultat.type === "succes") {
     return (
-      <View className="mt-4 items-center rounded-xl border border-green-200 bg-green-50 p-6">
+      <View className="mt-4 items-center rounded-card border border-green-200 bg-green-50 p-6">
         <Ionicons name="checkmark-circle" size={40} color="#15803d" />
         <Text className="mt-2 text-lg font-semibold text-green-800">Billet validé</Text>
         <Text className="mt-1 text-sm text-green-700">
@@ -111,8 +111,8 @@ function CarteResultat({
 
   const { icone, classeCarte, classeTexte, titre } = PRESENTATION[resultat.type];
   return (
-    <View className={`mt-4 items-center rounded-xl border p-6 ${classeCarte}`}>
-      <Ionicons name={icone} size={40} color={classeTexte.includes("red") ? "#b91c1c" : "#6B6560"} />
+    <View className={`mt-4 items-center rounded-card border p-6 ${classeCarte}`}>
+      <Ionicons name={icone} size={40} color={classeTexte.includes("red") ? "#b91c1c" : "#5C5248"} />
       <Text className={`mt-2 text-lg font-semibold ${classeTexte}`}>{titre}</Text>
       {resultat.type === "inconnu" ? (
         <Text className={`mt-1 text-sm ${classeTexte}`}>{resultat.message}</Text>
@@ -120,7 +120,7 @@ function CarteResultat({
       {resultat.type === "reseau" ? (
         <Pressable
           onPress={onReessayer}
-          className="mt-4 rounded-lg border border-line bg-surface px-4 py-2 active:opacity-70"
+          className="mt-4 rounded-chip border border-line bg-surface px-4 py-2 active:opacity-70"
         >
           <Text className="text-sm font-medium text-ink">Réessayer</Text>
         </Pressable>
@@ -201,7 +201,7 @@ export default function Scanner() {
       <Pressable
         onPress={valider}
         disabled={mutation.isPending}
-        className="items-center rounded-xl bg-brand-600 py-3 active:opacity-80 disabled:opacity-50"
+        className="items-center rounded-card bg-brand-500 py-3 active:opacity-80 disabled:opacity-50"
       >
         {mutation.isPending ? (
           <ActivityIndicator color="#FFFFFF" />
@@ -212,7 +212,7 @@ export default function Scanner() {
 
       <Pressable
         onPress={passerEnModeCamera}
-        className="mt-3 items-center rounded-xl border border-line py-3 active:opacity-70"
+        className="mt-3 items-center rounded-card border border-line py-3 active:opacity-70"
       >
         <Text className="text-base font-medium text-ink">Scanner avec la caméra</Text>
       </Pressable>
@@ -244,7 +244,7 @@ export default function Scanner() {
             />
             <Pressable
               onPress={() => setResultat(null)}
-              className="mt-3 items-center rounded-xl bg-brand-600 py-3 active:opacity-80"
+              className="mt-3 items-center rounded-card bg-brand-500 py-3 active:opacity-80"
             >
               <Text className="text-base font-medium text-white">Scanner à nouveau</Text>
             </Pressable>

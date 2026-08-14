@@ -15,7 +15,7 @@ export default function MesReservations() {
   if (isPending) {
     return (
       <View className="flex-1 items-center justify-center bg-surface-sunken">
-        <ActivityIndicator color="#D85314" />
+        <ActivityIndicator color="#FF6B00" />
       </View>
     );
   }
@@ -75,7 +75,7 @@ export default function MesReservations() {
 function CarteReservation({ reservation }: { reservation: Reservation }) {
   return (
     <Link href={`/reservation/${reservation.id}`} asChild>
-      <Pressable className="mb-3 rounded-xl border border-line bg-surface p-4 active:opacity-70">
+      <Pressable className="mb-3 rounded-card bg-surface p-4 active:opacity-70">
         <Text className="text-base font-medium text-ink" numberOfLines={2}>
           {reservation.evenement?.titre ?? "Événement"}
         </Text>
