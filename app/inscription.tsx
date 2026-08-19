@@ -126,13 +126,13 @@ export default function Inscription() {
         className="items-center rounded-card bg-brand-500 py-3 active:opacity-80 disabled:opacity-50"
       >
         {enCours ? (
-          <ActivityIndicator color="#FFFFFF" />
+          <ActivityIndicator color="#1A1410" />
         ) : (
-          <Text className="text-base font-medium text-white">Créer mon compte</Text>
+          <Text className="text-base font-medium text-ink">Créer mon compte</Text>
         )}
       </Pressable>
 
-      <Link href="/connexion" replace className="mt-4 text-center text-sm text-brand-600">
+      <Link href="/connexion" replace className="mt-4 text-center text-sm text-ink underline">
         Déjà un compte ? Se connecter
       </Link>
     </ScrollView>

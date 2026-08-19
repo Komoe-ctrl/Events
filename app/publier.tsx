@@ -45,7 +45,9 @@ export default function Publier() {
   if (succes) {
     return (
       <View className="flex-1 items-center justify-center bg-surface px-8">
-        <Ionicons name="time-outline" size={48} color="#FF6B00" />
+        {/* Icone d'etat "en attente", pas une action : meme couleur que le
+            badge EN_ATTENTE (bleu neutre), pas l'accent orange. */}
+        <Ionicons name="time-outline" size={48} color="#1D4ED8" />
         <Text className="mt-4 text-center text-lg font-medium text-ink">Événement soumis</Text>
         <Text className="mt-2 text-center text-sm text-ink-muted">
           Il est en attente de modération et ne sera visible publiquement qu'après validation
@@ -55,7 +57,7 @@ export default function Publier() {
           onPress={() => router.push("/mes-evenements")}
           className="mt-6 rounded-card bg-brand-500 px-6 py-3 active:opacity-80"
         >
-          <Text className="text-base font-medium text-white">Voir mes événements</Text>
+          <Text className="text-base font-medium text-ink">Voir mes événements</Text>
         </Pressable>
       </View>
     );
@@ -75,9 +77,9 @@ export default function Publier() {
         className="items-center rounded-card bg-brand-500 py-3 active:opacity-80 disabled:opacity-50"
       >
         {mutation.isPending ? (
-          <ActivityIndicator color="#FFFFFF" />
+          <ActivityIndicator color="#1A1410" />
         ) : (
-          <Text className="text-base font-medium text-white">Publier</Text>
+          <Text className="text-base font-medium text-ink">Publier</Text>
         )}
       </Pressable>
     </ScrollView>

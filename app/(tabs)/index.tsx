@@ -21,7 +21,7 @@ export default function AutourDeMoi() {
   if (isPending) {
     return (
       <View className="flex-1 items-center justify-center bg-surface-sunken">
-        <ActivityIndicator color="#FF6B00" />
+        <ActivityIndicator color="#B84800" />
       </View>
     );
   }
@@ -45,8 +45,12 @@ export default function AutourDeMoi() {
       renderItem={({ item }) => <CarteEvenement evenement={item} />}
       ListHeaderComponent={
         position.statut === "refuse" ? (
-          <View className="mb-3 rounded-card bg-brand-500 px-4 py-3">
-            <Text className="text-sm font-medium text-white">
+          // Notice, pas une action : l'accent est reserve aux actions
+          // primaires et a l'etat actif (regle de discipline couleur), donc
+          // pas d'aplat orange ici malgre l'ancienne tentation "ca doit se
+          // remarquer".
+          <View className="mb-3 rounded-card border border-line bg-surface px-4 py-3">
+            <Text className="text-sm font-medium text-ink-muted">
               Active la localisation pour trier les événements par distance.
             </Text>
           </View>

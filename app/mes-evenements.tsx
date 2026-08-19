@@ -14,7 +14,7 @@ export default function MesEvenements() {
   if (isPending) {
     return (
       <View className="flex-1 items-center justify-center bg-surface-sunken">
-        <ActivityIndicator color="#FF6B00" />
+        <ActivityIndicator color="#B84800" />
       </View>
     );
   }
@@ -63,10 +63,13 @@ function CarteEvenementOrganisateur({ evenement }: { evenement: Evenement }) {
       </Text>
       <View className="mt-2 flex-row items-center justify-between">
         <BadgeStatut statut={evenement.statut} />
+        {/* Affordance de ligne, pas l'action primaire de l'ecran (celle-ci
+            est "Publier un evenement", dans Profil) : encre attenuee plutot
+            qu'orange repete sur chaque ligne de liste. */}
         {modifiable ? (
-          <Text className="text-sm font-medium text-brand-600">Modifier</Text>
+          <Text className="text-sm font-medium text-ink-muted">Modifier</Text>
         ) : evenement.statut === "PUBLIE" ? (
-          <Text className="text-sm font-medium text-brand-600">Voir les inscrits</Text>
+          <Text className="text-sm font-medium text-ink-muted">Voir les inscrits</Text>
         ) : null}
       </View>
       {evenement.statut === "REFUSE" && evenement.motifRefus ? (
@@ -96,8 +99,15 @@ function CarteEvenementOrganisateur({ evenement }: { evenement: Evenement }) {
 
 function BadgeStatut({ statut }: { statut: StatutEvenement }) {
   const styles: Record<StatutEvenement, { classe: string; libelle: string }> = {
-    BROUILLON: { classe: "bg-surface-sunken text-ink-faint", libelle: "Brouillon" },
-    EN_ATTENTE: { classe: "bg-brand-50 text-brand-700", libelle: "En attente de modération" },
+    // text-ink-muted, pas text-ink-faint : ce badge utilise bg-surface-sunken
+    // comme propre fond, et faint n'y tient plus 4.5:1 depuis que sunken a
+    // ete assombri (regle de contraste).
+    BROUILLON: { classe: "bg-surface-sunken text-ink-muted", libelle: "Brouillon" },
+    // Palette semantique distincte de l'accent : chaque statut a sa propre
+    // famille de couleur, aucune ne recycle l'orange (regle de discipline
+    // couleur). Bleu plutot qu'amber : trop proche de l'orange en teinte,
+    // et "en attente" est un etat neutre/informatif, pas un avertissement.
+    EN_ATTENTE: { classe: "bg-blue-50 text-blue-700", libelle: "En attente de modération" },
     PUBLIE: { classe: "bg-green-50 text-green-700", libelle: "Publié" },
     REFUSE: { classe: "bg-red-50 text-red-700", libelle: "Refusé" },
   };

@@ -10,7 +10,7 @@ export default function Profil() {
   if (etat.statut === "chargement") {
     return (
       <View className="flex-1 items-center justify-center bg-surface-sunken">
-        <ActivityIndicator color="#FF6B00" />
+        <ActivityIndicator color="#B84800" />
       </View>
     );
   }
@@ -25,7 +25,9 @@ export default function Profil() {
           onPress={() => router.push("/connexion")}
           className="rounded-card bg-brand-500 px-6 py-3 active:opacity-80"
         >
-          <Text className="text-base font-medium text-white">Se connecter</Text>
+          {/* Encre sombre, pas blanc : blanc sur brand-500 ne tient que
+              ~2.85:1, sous le seuil 4.5:1 (mesure). */}
+          <Text className="text-base font-medium text-ink">Se connecter</Text>
         </Pressable>
 
         {/* Accessibles sans compte : ni la politique de confidentialite ni
@@ -101,7 +103,7 @@ function EntreeMenu({
           <Ionicons name={icone} size={20} color="#5C5248" />
           <Text className="text-base text-ink">{titre}</Text>
         </View>
-        <Ionicons name="chevron-forward" size={18} color="#948A7E" />
+        <Ionicons name="chevron-forward" size={18} color="#6B6560" />
       </Pressable>
     </Link>
   );
