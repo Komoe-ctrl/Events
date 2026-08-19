@@ -130,7 +130,7 @@ function EntreeMenuLien({
         <Ionicons name={icone} size={20} color="#5C5248" />
         <Text className="text-base text-ink">{titre}</Text>
       </View>
-      <Ionicons name="open-outline" size={18} color="#948A7E" />
+      <Ionicons name="open-outline" size={18} color="#6B6560" />
     </Pressable>
   );
 }
