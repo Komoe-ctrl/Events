@@ -66,7 +66,7 @@ export default function ModifierEvenement() {
   if (isPending || !initialise) {
     return (
       <View className="flex-1 items-center justify-center bg-surface">
-        <ActivityIndicator color="#FF6B00" />
+        <ActivityIndicator color="#B84800" />
       </View>
     );
   }
@@ -95,9 +95,9 @@ export default function ModifierEvenement() {
         className="items-center rounded-card bg-brand-500 py-3 active:opacity-80 disabled:opacity-50"
       >
         {mutation.isPending ? (
-          <ActivityIndicator color="#FFFFFF" />
+          <ActivityIndicator color="#1A1410" />
         ) : (
-          <Text className="text-base font-medium text-white">Enregistrer les modifications</Text>
+          <Text className="text-base font-medium text-ink">Enregistrer les modifications</Text>
         )}
       </Pressable>
     </ScrollView>

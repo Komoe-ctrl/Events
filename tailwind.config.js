@@ -24,12 +24,20 @@ module.exports = {
         ink: {
           DEFAULT: "#1A1410",
           muted: "#5C5248",
-          faint: "#948A7E",
+          // #948A7E ne passait pas 4.5:1 sur surface-sunken (3.16:1 mesure) —
+          // assombri pour rester lisible en plein soleil. C'est la cause du
+          // texte "ocre clair" repere sur l'onglet Carte (tabBarInactiveTintColor)
+          // et le placeholder des champs de formulaire.
+          faint: "#6B6560",
         },
         // Papier chaud, pas blanc pur : evite le "carte produit" generique.
         surface: {
           DEFAULT: "#FBF6F0",
-          sunken: "#F2EAE0",
+          // #F2EAE0 ne se distinguait de DEFAULT qu'a 1.11:1 (mesure) — les
+          // listes (Profil, Mes evenements...) se lisaient comme un bloc
+          // uniforme. Assombri pour separer nettement le fond du plan des
+          // cartes (~1.4:1), sans virer au gris ni au brun.
+          sunken: "#E3D2B8",
         },
         // Reserve aux separateurs fonctionnels (formulaires, listes admin) —
         // les cartes evenement de la direction 1 ne s'appuient pas sur une

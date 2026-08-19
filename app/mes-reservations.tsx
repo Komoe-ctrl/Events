@@ -15,7 +15,7 @@ export default function MesReservations() {
   if (isPending) {
     return (
       <View className="flex-1 items-center justify-center bg-surface-sunken">
-        <ActivityIndicator color="#FF6B00" />
+        <ActivityIndicator color="#B84800" />
       </View>
     );
   }
@@ -63,7 +63,7 @@ export default function MesReservations() {
       sections={sections}
       keyExtractor={(item) => item.id}
       renderSectionHeader={({ section }) => (
-        <Text className="mb-2 mt-4 text-sm font-medium uppercase text-ink-faint">
+        <Text className="mb-2 mt-4 text-sm font-medium uppercase text-ink-muted">
           {section.title}
         </Text>
       )}

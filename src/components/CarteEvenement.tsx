@@ -29,7 +29,11 @@ export function CarteEvenement({ evenement }: { evenement: Evenement }) {
               telle quelle, l'etiquette porte sa propre couleur comme un
               autocollant plutot que de deteindre sur l'image. */}
           <View className="absolute inset-x-0 top-0 flex-row items-start justify-between p-3">
-            <Text className="overflow-hidden rounded-chip bg-brand-500 px-2 py-1 text-label font-bold uppercase text-white">
+            {/* Etiquette de genre, pas une action ni un statut : reste en
+                aplat noir plutot qu'orange, pour que l'orange ne signifie
+                plus qu'une seule chose dans l'app (regle de discipline
+                couleur). */}
+            <Text className="overflow-hidden rounded-chip bg-ink px-2 py-1 text-label font-bold uppercase text-white">
               {LIBELLES_CATEGORIE[evenement.categorie] ?? evenement.categorie}
             </Text>
             <Text className="overflow-hidden rounded-chip bg-accent px-2 py-1 text-label font-bold uppercase text-accent-ink">

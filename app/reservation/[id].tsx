@@ -45,7 +45,7 @@ export default function DetailReservation() {
   if (enLigne.isPending && enCache.isPending) {
     return (
       <View className="flex-1 items-center justify-center bg-surface">
-        <ActivityIndicator color="#FF6B00" />
+        <ActivityIndicator color="#B84800" />
       </View>
     );
   }

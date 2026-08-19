@@ -10,7 +10,7 @@ function BoutonValiderBillet({ evenementId }: { evenementId: string }) {
   return (
     <Link href={`/evenement/${evenementId}/scanner`} asChild>
       <Pressable className="mb-4 items-center rounded-card bg-brand-500 py-3 active:opacity-80">
-        <Text className="text-base font-medium text-white">Valider un billet</Text>
+        <Text className="text-base font-medium text-ink">Valider un billet</Text>
       </Pressable>
     </Link>
   );
@@ -54,7 +54,7 @@ export default function Inscrits() {
   if (isPending) {
     return (
       <View className="flex-1 items-center justify-center bg-surface-sunken">
-        <ActivityIndicator color="#FF6B00" />
+        <ActivityIndicator color="#B84800" />
       </View>
     );
   }
