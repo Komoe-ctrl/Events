@@ -10,8 +10,8 @@ l'application au moment de sa rédaction, pas un modèle générique.
 ## 1. Qui est responsable de vos données
 
 **[ÉDITEUR — À COMPLÉTER]**, éditeur de l'application Alentour (voir les
-[mentions légales](./mentions-legales.md)), est responsable du traitement
-des données décrites ici.
+[mentions légales](/fr/legal/mentions-legales)), est responsable du
+traitement des données décrites ici.
 
 Contact pour toute question ou demande relative à vos données :
 **[ADRESSE EMAIL DE CONTACT — À COMPLÉTER]**

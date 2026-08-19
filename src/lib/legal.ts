@@ -1,14 +1,17 @@
 /**
  * URL publiques des documents legaux, ouvertes dans le navigateur depuis
- * l'onglet Profil. Servies par le portfolio Next.js (deploiement Vercel
- * existant, hors de ce depot) — lit legal/*.md au build, source unique,
- * aucune synchronisation manuelle.
- *
- * Le domaine reste un placeholder tant qu'aucun nom de domaine propre n'est
- * pris : c'est le seul endroit a changer le jour ou ca arrive (voir
+ * l'onglet Profil. Servies par le portfolio Next.js (depot separe,
+ * https://github.com/Komoe-ctrl/portfolio) — lit content/legal/*.md au
+ * build (remark/rehype), source unique, aucune synchronisation
+ * automatique entre les deux depots : copier les .md de ce depot vers
+ * portfolio/content/legal/ a chaque changement de contenu (voir
  * legal/NOTES.md).
+ *
+ * Domaine du portfolio (lib/site.ts, SITE_URL) : a remplacer ici le jour
+ * ou un nom de domaine propre est pris — c'est le seul endroit a changer
+ * cote app.
  */
 export const URL_POLITIQUE_CONFIDENTIALITE =
-  "https://TON-DOMAINE-A-DEFINIR.vercel.app/fr/legal/confidentialite";
+  "https://komoe-emile.vercel.app/fr/legal/confidentialite";
 export const URL_MENTIONS_LEGALES =
-  "https://TON-DOMAINE-A-DEFINIR.vercel.app/fr/legal/mentions-legales";
+  "https://komoe-emile.vercel.app/fr/legal/mentions-legales";
