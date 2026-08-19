@@ -72,6 +72,42 @@ pas prétendre le contraire sans que ce soit faux.
 
 ## Étape 3 — accessibilité publique
 
-Voir la réponse de la conversation au moment de l'étape 3 pour l'évaluation
-complète (Vercel vs alternatives). Résumé : deux pages statiques sur le
-Vercel existant (portfolio) est la voie retenue.
+**Dans l'app** : entrées "Politique de confidentialité" / "Mentions
+légales" dans l'onglet Profil (`app/(tabs)/profil.tsx`), visibles avec ou
+sans connexion. Elles ouvrent une URL externe (`Linking.openURL`, pas de
+rendu markdown natif — évite une dépendance et une duplication de contenu
+entre l'app et la page publique). URLs placeholder dans `src/lib/legal.ts`,
+à remplacer une fois le déploiement fait.
+
+**Évaluation hébergement — deux options viables :**
+
+1. **Réutiliser le projet Vercel du portfolio**, deux nouvelles pages
+   (`/politique-confidentialite`, `/mentions-legales`). Le plus rapide :
+   zéro nouveau compte, zéro nouveau projet, tu sais déjà déployer dessus.
+   Inconvénient réel : le couple à la durée de vie d'un projet personnel —
+   si le portfolio est un jour refondu, renommé ou dépublié, l'URL exigée
+   par le Play Store casse (récupérable en mettant à jour la fiche store,
+   mais un aller-retour évitable).
+
+2. **Un second projet Vercel dédié à Alentour** (recommandé) — deux
+   fichiers HTML statiques, `vercel.json` minimal, aucun framework requis.
+   Même compte, même gratuité, ~10 minutes de plus que l'option 1, mais
+   découplé du portfolio : renommer/retirer le portfolio n'affecte jamais
+   les pages légales. Donne une URL type
+   `alentour-legal.vercel.app/politique-confidentialite` — pointable plus
+   tard sur un vrai domaine (`alentour.ci` ou autre) sans rien changer côté
+   app, juste la config DNS du projet Vercel.
+
+Décision : à confirmer par l'utilisateur. Dans les deux cas, il faut
+convertir `legal/politique-confidentialite.md` et `legal/mentions-legales.md`
+en HTML servable (fichiers `.html` statiques si pas de framework ; pages
+si le portfolio utilise Next.js/Astro/etc. — a verifier selon la stack
+reelle du portfolio). Pas de pipeline de synchronisation automatique entre
+les `.md` sources et la page publiée : mise à jour manuelle a chaque
+changement de contenu, deliberement, pour ne pas construire une
+infrastructure de publication pour deux pages statiques.
+
+Une fois les vraies URLs connues : mettre à jour
+`src/lib/legal.ts` (URL_POLITIQUE_CONFIDENTIALITE, URL_MENTIONS_LEGALES)
+et la fiche Play Store (champ "Politique de confidentialité", obligatoire
+a la soumission).
