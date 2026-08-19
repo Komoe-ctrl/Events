@@ -16,6 +16,7 @@ export default function Inscription() {
 
   const [erreurNom, setErreurNom] = useState<string | undefined>();
   const [erreurTelephone, setErreurTelephone] = useState<string | undefined>();
+  const [erreurEmail, setErreurEmail] = useState<string | undefined>();
   const [erreurMotDePasse, setErreurMotDePasse] = useState<string | undefined>();
   const [erreurGenerale, setErreurGenerale] = useState<string | undefined>();
   const [enCours, setEnCours] = useState(false);
@@ -23,6 +24,7 @@ export default function Inscription() {
   const soumettre = async () => {
     setErreurNom(undefined);
     setErreurTelephone(undefined);
+    setErreurEmail(undefined);
     setErreurMotDePasse(undefined);
     setErreurGenerale(undefined);
 
@@ -38,6 +40,14 @@ export default function Inscription() {
       );
       valide = false;
     }
+    // Obligatoire cote API depuis la reinitialisation de mot de passe par
+    // email (sans email, aucun moyen de recuperer un compte perdu) — le
+    // libelle affichait encore "optionnel" par oubli, corrige avec cette
+    // validation.
+    if (email.trim().length === 0) {
+      setErreurEmail("L'email est requis.");
+      valide = false;
+    }
     if (motDePasse.length < 8) {
       setErreurMotDePasse("Le mot de passe doit contenir au moins 8 caractères.");
       valide = false;
@@ -49,7 +59,7 @@ export default function Inscription() {
       await inscription({
         nom: nom.trim(),
         telephone: telephoneNormalise,
-        email: email.trim() || undefined,
+        email: email.trim(),
         motDePasse,
       });
       revenirOuAller("/(tabs)");
@@ -91,12 +101,13 @@ export default function Inscription() {
         erreur={erreurTelephone}
       />
       <ChampTexte
-        label="Email (optionnel)"
+        label="Email"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
         autoComplete="email"
+        erreur={erreurEmail}
       />
       <ChampTexte
         label="Mot de passe"

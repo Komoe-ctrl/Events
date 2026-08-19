@@ -30,3 +30,10 @@ export async function lireReservationEnCache(id: string): Promise<Reservation | 
   const cache = await lireCache();
   return cache[id] ?? null;
 }
+
+/** A appeler a la deconnexion : sans ca, les reservations d'un utilisateur
+ * restent lisibles sur l'appareil apres deconnexion, y compris par la
+ * personne suivante a se connecter dessus. */
+export async function viderCacheReservations(): Promise<void> {
+  await AsyncStorage.removeItem(CLE_CACHE);
+}

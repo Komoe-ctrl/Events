@@ -7,6 +7,7 @@ import {
   supprimerJeton,
   supprimerUtilisateur,
 } from "@/lib/authStorage";
+import { viderCacheReservations } from "@/lib/reservationCache";
 import type { ReponseAuth, RoleUtilisateur, Utilisateur } from "@/types/utilisateur";
 
 export type DonneesConnexion = {
@@ -17,7 +18,9 @@ export type DonneesConnexion = {
 export type DonneesInscription = {
   nom: string;
   telephone: string;
-  email?: string;
+  // Obligatoire cote API (voir InscriptionDto, alentour-api) : seul canal
+  // de recuperation d'un compte perdu.
+  email: string;
   motDePasse: string;
   role?: Extract<RoleUtilisateur, "PARTICIPANT" | "ORGANISATEUR">;
 };
@@ -41,9 +44,16 @@ export async function inscription(donnees: DonneesInscription): Promise<Utilisat
 }
 
 /** Pas d'endpoint de deconnexion dans le contrat API — un JWT se "deconnecte"
- * en supprimant simplement le jeton et le profil locaux. */
+ * en supprimant simplement le jeton et le profil locaux. Le cache de
+ * reservations est efface avec : sans ca, les reservations du compte
+ * precedent restent lisibles sur l'appareil (fuite entre utilisateurs d'un
+ * meme appareil, corrigee suite a l'inventaire de confidentialite). */
 export async function deconnexion(): Promise<void> {
-  await Promise.all([supprimerJeton(), supprimerUtilisateur()]);
+  await Promise.all([
+    supprimerJeton(),
+    supprimerUtilisateur(),
+    viderCacheReservations(),
+  ]);
 }
 
 /**

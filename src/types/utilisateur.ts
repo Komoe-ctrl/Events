@@ -4,7 +4,7 @@ export type Utilisateur = {
   id: string;
   nom: string;
   telephone: string;
-  email: string | null;
+  email: string;
   role: RoleUtilisateur;
   createdAt: string;
 };
