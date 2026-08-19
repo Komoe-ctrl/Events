@@ -1,7 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Link, router, type Href } from "expo-router";
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, Linking, Pressable, ScrollView, Text, View } from "react-native";
 import { useAuth } from "@/features/auth/AuthContext";
+import { URL_MENTIONS_LEGALES, URL_POLITIQUE_CONFIDENTIALITE } from "@/lib/legal";
 
 export default function Profil() {
   const { etat, deconnexion } = useAuth();
@@ -26,6 +27,19 @@ export default function Profil() {
         >
           <Text className="text-base font-medium text-white">Se connecter</Text>
         </Pressable>
+
+        {/* Accessibles sans compte : ni la politique de confidentialite ni
+            les mentions legales ne doivent dependre d'une connexion. */}
+        <View className="mt-8 items-center gap-2">
+          <Pressable onPress={() => Linking.openURL(URL_POLITIQUE_CONFIDENTIALITE)}>
+            <Text className="text-sm text-ink-muted underline">
+              Politique de confidentialité
+            </Text>
+          </Pressable>
+          <Pressable onPress={() => Linking.openURL(URL_MENTIONS_LEGALES)}>
+            <Text className="text-sm text-ink-muted underline">Mentions légales</Text>
+          </Pressable>
+        </View>
       </View>
     );
   }
@@ -49,6 +63,17 @@ export default function Profil() {
       {utilisateur.role === "ADMIN" ? (
         <EntreeMenu titre="Modération" icone="shield-checkmark-outline" href="/moderation" />
       ) : null}
+
+      <EntreeMenuLien
+        titre="Politique de confidentialité"
+        icone="document-text-outline"
+        url={URL_POLITIQUE_CONFIDENTIALITE}
+      />
+      <EntreeMenuLien
+        titre="Mentions légales"
+        icone="information-circle-outline"
+        url={URL_MENTIONS_LEGALES}
+      />
 
       <Pressable
         onPress={() => deconnexion()}
@@ -79,5 +104,31 @@ function EntreeMenu({
         <Ionicons name="chevron-forward" size={18} color="#948A7E" />
       </Pressable>
     </Link>
+  );
+}
+
+// Meme presentation que EntreeMenu, mais ouvre une URL externe (navigateur)
+// au lieu de naviguer dans l'app : pas de route interne pour ce contenu,
+// il vit sur une page web publique (voir src/lib/legal.ts).
+function EntreeMenuLien({
+  titre,
+  icone,
+  url,
+}: {
+  titre: string;
+  icone: keyof typeof Ionicons.glyphMap;
+  url: string;
+}) {
+  return (
+    <Pressable
+      onPress={() => Linking.openURL(url)}
+      className="mb-3 flex-row items-center justify-between rounded-card bg-surface px-4 py-4 active:opacity-70"
+    >
+      <View className="flex-row items-center gap-3">
+        <Ionicons name={icone} size={20} color="#5C5248" />
+        <Text className="text-base text-ink">{titre}</Text>
+      </View>
+      <Ionicons name="open-outline" size={18} color="#948A7E" />
+    </Pressable>
   );
 }
