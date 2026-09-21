@@ -4,7 +4,10 @@ Application mobile de découverte, publication et réservation d'événements à
 Abidjan (Côte d'Ivoire).
 
 Ce fichier est **identique dans les deux dépôts**. La duplication est
-volontaire : chaque côté doit connaître le contrat de l'autre.
+volontaire : chaque côté doit connaître le contrat de l'autre. Toute
+modification de ce fichier doit être répercutée dans l'autre dépôt dans la
+même session, puis vérifiée par un `diff` entre les deux copies — une
+modification n'est terminée que quand ce `diff` ne montre plus rien.
 
 - `alentour` — application mobile Expo / React Native
 - `alentour-api` — API NestJS
@@ -64,13 +67,15 @@ locale d'Abidjan est la responsabilité du client mobile.
 
 ### Identité
 
-Le **téléphone** est l'identifiant principal, pas l'email. En Côte d'Ivoire un
-utilisateur a toujours un numéro, pas toujours une adresse mail. L'email est
-optionnel.
+Le **téléphone** est l'identifiant principal, pas l'email — en Côte d'Ivoire
+un utilisateur a toujours un numéro, pas toujours une adresse mail. L'email
+est néanmoins **obligatoire** à l'inscription : c'est l'unique canal de
+récupération de mot de passe (lien de réinitialisation envoyé par email), son
+absence bloquerait ce parcours pour le compte concerné.
 
 ### Modèle de données canonique
 
-**Utilisateur** — `id`, `nom`, `telephone` (unique), `email` (optionnel,
+**Utilisateur** — `id`, `nom`, `telephone` (unique), `email` (obligatoire,
 unique), `motDePasseHash`, `role` (`PARTICIPANT` | `ORGANISATEUR` | `ADMIN`),
 `createdAt`
 
@@ -78,7 +83,7 @@ unique), `motDePasseHash`, `role` (`PARTICIPANT` | `ORGANISATEUR` | `ADMIN`),
 (`CONCERT` | `SOIREE` | `CONFERENCE` | `SPORT` | `CULTURE` | `RELIGIEUX`),
 `dateDebut`, `dateFin` (nullable), `prix` (nullable, `null` = gratuit),
 `capacite` (nullable, `null` = illimité), `latitude`, `longitude`, `adresse`,
-`commune`, `statut` (`BROUILLON` | `EN_ATTENTE` | `PUBLIE` | `REFUSE`),
+`commune`, `statut` (`EN_ATTENTE` | `PUBLIE` | `REFUSE`),
 `motifRefus` (nullable), `organisateurId`, `contactOrganisateur`, `createdAt`,
 `updatedAt`
 
@@ -93,6 +98,8 @@ Préfixe global `/api`.
 ```
 POST   /auth/inscription
 POST   /auth/connexion
+POST   /auth/mot-de-passe-oublie      envoie un lien de réinitialisation par email
+POST   /auth/mot-de-passe-reinitialisation
 GET    /evenements                    filtres : lat, lng, rayonKm, categorie,
                                       dateMin, dateMax
 GET    /evenements/:id
@@ -127,8 +134,8 @@ silencieux.
 4. **Une seule réservation active par utilisateur et par événement.**
    Contrainte imposée par la base, pas seulement par le code.
 5. **Seuls les événements en statut `PUBLIE` sortent des endpoints publics.**
-   Un `BROUILLON`, `EN_ATTENTE` ou `REFUSE` ne fuite jamais, même par accès
-   direct à son identifiant.
+   Un `EN_ATTENTE` ou `REFUSE` ne fuite jamais, même par accès direct à son
+   identifiant.
 6. **La propriété est vérifiée côté serveur.** Un organisateur ne modifie que
    ses propres événements. Ne fais jamais confiance à un identifiant transmis
    par le client pour déterminer qui agit.
@@ -286,7 +293,21 @@ chaque décision, pas hériter d'un code que je n'ai pas lu.
 
 ## État actuel
 
-- `alentour` — projet initialisé, navigation et écrans squelettes en place,
-  `src/features/events/api.ts` renvoie des données en dur.
-- `alentour-api` — dépôt vide. Prochaine étape : le schéma Prisma seul, avec
-  justification des index et des relations.
+Les deux dépôts sont fonctionnels et branchés l'un sur l'autre (audit complet
+dans `docs/ETAT_DES_LIEUX.md`, côté `alentour-api`).
+
+- `alentour-api` — API complète pour l'authentification (inscription,
+  connexion, récupération de mot de passe par email), les événements
+  (recherche géolocalisée en SQL, publication, modération) et les
+  réservations (transaction avec verrou de ligne contre la surréservation).
+  CORS grand ouvert et absence de rate limiting restent à corriger avant tout
+  déploiement au-delà d'un poste de dev.
+- `alentour` — écrans participant, organisateur, authentification et
+  modération ADMIN entièrement branchés sur l'API réelle, plus aucune donnée
+  en dur. Restent à terminer : l'onglet Carte (placeholder, clés Google Maps
+  non configurées) et les écrans de récupération de mot de passe (les
+  endpoints existent déjà côté API).
+
+Prochaine étape : durcissement sécurité de l'API (CORS restreint, rate
+limiting, révocation de session) et alignement des réponses de mutation sur
+celles des lectures.
