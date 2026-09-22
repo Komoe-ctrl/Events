@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  mobile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - run: npm ci
+
+      - run: npx tsc --noEmit
+
+      # "lint" vaut aussi tsc --noEmit aujourd'hui (package.json) : redondant
+      # avec l'etape precedente tant qu'aucun linter dedie (ESLint) n'est en
+      # place. Garde separe car demande explicitement, et pour ne pas avoir
+      # a toucher ce fichier le jour ou "lint" fait autre chose.
+      - run: npm run lint
+
+      # continue-on-error tant que les 3 avertissements connus ne sont pas
+      # corriges (voir docs/ETAT_DES_LIEUX.md cote alentour-api) : schema
+      # app.json obsolete (newArchEnabled/splash/edgeToEdgeEnabled mal
+      # places) + icone adaptative Android manquante, expo-font absent de
+      # package.json, paquets Expo en retard de patchs sur le SDK 57.
+      - run: npx expo-doctor
+        continue-on-error: true
