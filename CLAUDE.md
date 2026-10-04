@@ -181,6 +181,25 @@ src/
   admin/
 ```
 
+### Mécanismes internes / sécurité
+
+Ces éléments vivent uniquement dans ce dépôt — jamais sérialisés vers le
+mobile, absents du modèle canonique ci-dessus (contrat partagé) :
+
+- **`Utilisateur.versionToken`** (`Int`, défaut `0`) — révocation de
+  session. Incrémenté à chaque réinitialisation de mot de passe, inclus
+  dans le payload JWT à la connexion. `JwtStrategy` compare cette valeur à
+  celle en base à chaque requête authentifiée et rejette le jeton si elles
+  diffèrent — sans ça, un JWT resterait valide jusqu'à expiration (30
+  jours) même après une réinitialisation de mot de passe.
+- **`TokenReinitialisation`** — jeton de réinitialisation de mot de passe.
+  Hash SHA-256 du jeton (pas argon2 : valeur aléatoire à haute entropie
+  générée côté serveur, pas un mot de passe choisi par un humain — pas
+  besoin d'un hachage lent). Durée de vie 30 minutes, usage unique, maximum
+  3 demandes par heure et par compte.
+- **Hash du mot de passe** — argon2 (`Utilisateur.motDePasseHash`), jamais
+  en clair, jamais exposé dans aucune réponse API.
+
 ### Règles
 
 - **Les contrôleurs restent minces.** Ils reçoivent un DTO validé, appellent un
@@ -271,23 +290,6 @@ src/
 - Pas de `console.log` laissé dans le code livré.
 - Pas de secret en dur. Tout passe par des variables d'environnement, et
   `.env.example` est tenu à jour à chaque ajout.
-
----
-
-## Workflow Git
-
-- **Jamais de commit direct sur `main`.**
-- **Une branche par sujet**, créée depuis `main` à jour (`git checkout main
-  && git pull` avant chaque création), nommée `type/description-courte` :
-  `feat`, `fix`, `securite`, `chore`, `docs`, `test`.
-- **Commits au format Conventional Commits** (`feat:`, `fix:`, `chore:`,
-  `docs:`, `securite:`, `test:`…), rédigés en français.
-- **Une PR par branche**, ouverte avec `gh pr create` en remplissant le
-  template (`.github/pull_request_template.md`).
-- **Ne jamais merger soi-même une PR, ne jamais force-push, ne jamais
-  modifier la configuration de protection de branche.**
-- **S'arrêter après l'ouverture de la PR** et attendre la validation avant
-  de continuer.
 
 ---
 
