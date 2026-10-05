@@ -132,8 +132,12 @@ export default function Inscription() {
         )}
       </Pressable>
 
-      <Link href="/connexion" replace className="mt-4 text-center text-sm text-ink underline">
-        Déjà un compte ? Se connecter
+      <Link href="/connexion" replace asChild>
+        <Pressable hitSlop={12} className="mt-4 items-center">
+          <Text className="text-center text-sm text-ink underline">
+            Déjà un compte ? Se connecter
+          </Text>
+        </Pressable>
       </Link>
     </ScrollView>
   );

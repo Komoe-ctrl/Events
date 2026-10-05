@@ -33,12 +33,15 @@ export default function Profil() {
         {/* Accessibles sans compte : ni la politique de confidentialite ni
             les mentions legales ne doivent dependre d'une connexion. */}
         <View className="mt-8 items-center gap-2">
-          <Pressable onPress={() => Linking.openURL(URL_POLITIQUE_CONFIDENTIALITE)}>
+          <Pressable
+            hitSlop={12}
+            onPress={() => Linking.openURL(URL_POLITIQUE_CONFIDENTIALITE)}
+          >
             <Text className="text-sm text-ink-muted underline">
               Politique de confidentialité
             </Text>
           </Pressable>
-          <Pressable onPress={() => Linking.openURL(URL_MENTIONS_LEGALES)}>
+          <Pressable hitSlop={12} onPress={() => Linking.openURL(URL_MENTIONS_LEGALES)}>
             <Text className="text-sm text-ink-muted underline">Mentions légales</Text>
           </Pressable>
         </View>

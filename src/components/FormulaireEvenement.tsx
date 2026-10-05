@@ -213,7 +213,7 @@ export function FormulaireEvenement({
             <Pressable
               key={c.valeur}
               onPress={() => onChange({ ...valeurs, categorie: c.valeur })}
-              className={`rounded-full border px-4 py-2 ${
+              className={`min-h-[44px] items-center justify-center rounded-full border px-4 py-2 ${
                 valeurs.categorie === c.valeur ? "border-brand-600 bg-brand-50" : "border-line"
               }`}
             >
