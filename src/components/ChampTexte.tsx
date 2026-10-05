@@ -2,10 +2,11 @@ import { Text, TextInput, View, type TextInputProps } from "react-native";
 
 type Props = TextInputProps & {
   label: string;
+  texteAide?: string;
   erreur?: string;
 };
 
-export function ChampTexte({ label, erreur, ...proprietesInput }: Props) {
+export function ChampTexte({ label, texteAide, erreur, ...proprietesInput }: Props) {
   return (
     <View className="mb-4">
       <Text className="mb-1 text-sm font-medium text-ink">{label}</Text>
@@ -16,7 +17,13 @@ export function ChampTexte({ label, erreur, ...proprietesInput }: Props) {
         placeholderTextColor="#6B6560"
         {...proprietesInput}
       />
-      {erreur ? <Text className="mt-1 text-sm text-red-600">{erreur}</Text> : null}
+      {/* Un seul emplacement, toujours de la meme hauteur (min-h) : erreur
+          prioritaire sur texteAide, jamais les deux a la fois. Sans ce
+          slot fixe, le formulaire saute d'une ligne des qu'une erreur de
+          validation apparait ou disparait. */}
+      <Text className={`mt-1 min-h-[20px] text-sm ${erreur ? "text-red-600" : "text-ink-faint"}`}>
+        {erreur ?? texteAide ?? ""}
+      </Text>
     </View>
   );
 }

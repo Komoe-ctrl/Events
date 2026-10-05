@@ -1,21 +1,24 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "expo-router";
-import { ActivityIndicator, FlatList, Image, Pressable, Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
+import { CarteEvenement } from "@/components/CarteEvenement";
+import { EtatErreur } from "@/components/EtatErreur";
+import { EtatVide } from "@/components/EtatVide";
+import { SqueletteCarteModeration } from "@/components/Squelette";
 import { recupererEvenementsAModerer } from "@/features/events/api";
 import { ErreurApi } from "@/lib/apiClient";
-import { formaterDateEvenement } from "@/lib/date";
-import type { Evenement } from "@/types/event";
 
 export default function Moderation() {
-  const { data, isPending, isError, error } = useQuery({
+  const { data, isPending, isError, error, refetch } = useQuery({
     queryKey: ["evenements", "moderation"],
     queryFn: recupererEvenementsAModerer,
   });
 
   if (isPending) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-sunken">
-        <ActivityIndicator color="#B84800" />
+      <View className="flex-1 bg-surface-sunken px-4 pt-4">
+        {[1, 2, 3].map((n) => (
+          <SqueletteCarteModeration key={n} />
+        ))}
       </View>
     );
   }
@@ -28,22 +31,28 @@ export default function Moderation() {
     // reseau. RolesGuard rejette avec ACCES_REFUSE (403) cote serveur.
     const accesRefuse = error instanceof ErreurApi && error.code === "ACCES_REFUSE";
     return (
-      <View className="flex-1 items-center justify-center bg-surface-sunken px-8">
-        <Text className="text-center text-ink-muted">
-          {accesRefuse
-            ? "Cet écran est réservé aux administrateurs."
-            : "Impossible de charger la file de modération. Vérifie ta connexion."}
-        </Text>
+      <View className="flex-1 bg-surface-sunken">
+        <EtatErreur
+          texte={
+            accesRefuse
+              ? "Cet écran est réservé aux administrateurs."
+              : "Impossible de charger la file de modération. Vérifie ta connexion."
+          }
+          // Pas de "Reessayer" sur un refus d'acces : retenter ne changera
+          // pas le role de l'utilisateur connecte.
+          onReessayer={accesRefuse ? undefined : () => refetch()}
+        />
       </View>
     );
   }
 
   if (data.length === 0) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-sunken px-8">
-        <Text className="text-center text-ink-muted">
-          Aucun événement en attente de modération.
-        </Text>
+      <View className="flex-1 bg-surface-sunken">
+        <EtatVide
+          icone="shield-checkmark-outline"
+          texte="Aucun événement en attente de modération."
+        />
       </View>
     );
   }
@@ -68,28 +77,7 @@ export default function Moderation() {
           {evenements.length} événement{evenements.length > 1 ? "s" : ""} en attente
         </Text>
       }
-      renderItem={({ item }) => <CarteAModerer evenement={item} />}
+      renderItem={({ item }) => <CarteEvenement evenement={item} variante="moderation" />}
     />
-  );
-}
-
-function CarteAModerer({ evenement }: { evenement: Evenement }) {
-  return (
-    <Link href={`/moderation/${evenement.id}`} asChild>
-      <Pressable className="mb-3 overflow-hidden rounded-xl border border-line bg-surface active:opacity-80">
-        <Image source={{ uri: evenement.image }} style={{ width: "100%", height: 120 }} />
-        <View className="p-4">
-          <Text className="text-base font-medium text-ink" numberOfLines={2}>
-            {evenement.titre}
-          </Text>
-          <Text className="mt-1 text-sm text-ink-muted">
-            {formaterDateEvenement(evenement.dateDebut)} · {evenement.commune}
-          </Text>
-          <Text className="mt-1 text-xs text-ink-faint">
-            Soumis le {formaterDateEvenement(evenement.createdAt)}
-          </Text>
-        </View>
-      </Pressable>
-    </Link>
   );
 }

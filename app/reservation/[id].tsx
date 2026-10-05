@@ -5,6 +5,9 @@ import { useState } from "react";
 import { ActivityIndicator, Modal, Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import QRCode from "react-native-qrcode-svg";
+import { Bouton } from "@/components/Bouton";
+import { EtatErreur } from "@/components/EtatErreur";
+import { Squelette } from "@/components/Squelette";
 import {
   annulerReservation,
   recupererMesReservations,
@@ -50,21 +53,25 @@ export default function DetailReservation() {
 
   if (enLigne.isPending && enCache.isPending) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface">
-        <ActivityIndicator color="#B84800" />
+      <View className="flex-1 items-center bg-surface p-6">
+        <Squelette hauteur={24} largeur="60%" className="self-start" />
+        <Squelette hauteur={14} largeur="40%" className="mt-2 self-start" />
+        <Squelette hauteur={220} largeur={220} className="mt-8" />
       </View>
     );
   }
 
   if (!reservation) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface px-8">
-        <Text className="text-center text-ink-muted">
-          Réservation introuvable.
-          {enLigne.isError
-            ? " Vérifie ta connexion — elle n'a peut-être pas encore été mise en cache sur cet appareil."
-            : ""}
-        </Text>
+      <View className="flex-1 bg-surface">
+        <EtatErreur
+          texte={`Réservation introuvable.${
+            enLigne.isError
+              ? " Vérifie ta connexion — elle n'a peut-être pas encore été mise en cache sur cet appareil."
+              : ""
+          }`}
+          onReessayer={() => enLigne.refetch()}
+        />
       </View>
     );
   }
@@ -148,23 +155,23 @@ export default function DetailReservation() {
               Vous pourrez réserver à nouveau si vous changez d'avis.
             </Text>
             <View className="mt-5 flex-row justify-end gap-3">
-              <Pressable
+              <Bouton
+                variante="discret"
+                taille="petit"
                 onPress={() => setConfirmationVisible(false)}
-                className="min-h-[44px] items-center justify-center rounded-chip px-4 py-2 active:opacity-70"
               >
-                <Text className="text-base text-ink">Non</Text>
-              </Pressable>
-              <Pressable
+                Non
+              </Bouton>
+              <Bouton
+                variante="danger"
+                taille="petit"
                 onPress={() => {
                   setConfirmationVisible(false);
                   mutationAnnulation.mutate();
                 }}
-                className="min-h-[44px] items-center justify-center rounded-chip bg-red-600 px-4 py-2 active:opacity-80"
               >
-                <Text className="text-base font-medium text-white">
-                  Annuler la réservation
-                </Text>
-              </Pressable>
+                Annuler la réservation
+              </Bouton>
             </View>
           </View>
         </View>

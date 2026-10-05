@@ -2,7 +2,10 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { Link, router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
+import { Bouton } from "@/components/Bouton";
+import { EtatErreur } from "@/components/EtatErreur";
+import { SqueletteDetailEvenement } from "@/components/Squelette";
 import { useAuth } from "@/features/auth/AuthContext";
 import { recupererEvenement } from "@/features/events/api";
 import { creerReservation, recupererMesReservations } from "@/features/reservations/api";
@@ -24,7 +27,7 @@ export default function FicheEvenement() {
   const queryClient = useQueryClient();
   const [nombrePlacesSaisi, setNombrePlacesSaisi] = useState(1);
 
-  const { data, isPending, error } = useQuery({
+  const { data, isPending, error, refetch } = useQuery({
     queryKey: ["evenement", id],
     queryFn: () => recupererEvenement(id),
     enabled: Boolean(id),
@@ -72,10 +75,8 @@ export default function FicheEvenement() {
 
   if (isPending) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface">
-        {/* brand-700, pas brand-500 : #FF6B00 direct sur fond clair ne
-            tient que 2.66:1 (mesure), sous le seuil non-textuel de 3:1. */}
-        <ActivityIndicator color="#B84800" />
+      <View className="flex-1 bg-surface">
+        <SqueletteDetailEvenement />
       </View>
     );
   }
@@ -83,12 +84,17 @@ export default function FicheEvenement() {
   if (error) {
     const introuvable = error instanceof ErreurApi && error.statutHttp === 404;
     return (
-      <View className="flex-1 items-center justify-center bg-surface px-8">
-        <Text className="text-center text-ink-muted">
-          {introuvable
-            ? "Événement introuvable."
-            : "Impossible de charger cet événement. Vérifie ta connexion."}
-        </Text>
+      <View className="flex-1 bg-surface">
+        <EtatErreur
+          texte={
+            introuvable
+              ? "Événement introuvable."
+              : "Impossible de charger cet événement. Vérifie ta connexion."
+          }
+          // Pas de "Reessayer" si l'evenement n'existe vraiment pas : relancer
+          // la meme requete echouerait exactement pareil.
+          onReessayer={introuvable ? undefined : () => refetch()}
+        />
       </View>
     );
   }
@@ -189,19 +195,13 @@ export default function FicheEvenement() {
                 </Text>
               ) : null}
 
-              <Pressable
+              <Bouton
                 onPress={() => gererReservation(nombrePlaces)}
-                disabled={mutationReservation.isPending || etat.statut === "chargement"}
-                className="items-center rounded-card bg-brand-500 py-3.5 active:opacity-80 disabled:opacity-50"
+                chargement={mutationReservation.isPending}
+                disabled={etat.statut === "chargement"}
               >
-                {/* Anton reserve aux titres, pas aux libelles/boutons —
-                    meme traitement que les autres actions primaires. */}
-                {mutationReservation.isPending ? (
-                  <ActivityIndicator color="#1A1410" />
-                ) : (
-                  <Text className="text-base font-medium text-ink">Réserver</Text>
-                )}
-              </Pressable>
+                Réserver
+              </Bouton>
             </>
           )}
 

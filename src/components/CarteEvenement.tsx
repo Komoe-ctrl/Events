@@ -14,7 +14,43 @@ const LIBELLES_CATEGORIE: Record<string, string> = {
   RELIGIEUX: "Religieux",
 };
 
-export function CarteEvenement({ evenement }: { evenement: Evenement }) {
+type Props = {
+  evenement: Evenement;
+  // "moderation" : ancien CarteAModerer (app/moderation.tsx), fusionne ici
+  // pour ne garder qu'une seule implementation du "carte -> fiche
+  // evenement". Visuel non retouche au passage (rounded-xl, pas rounded-card
+  // : la moderation n'a pas encore recu la passe de design, voir
+  // tailwind.config.js) — seule la duplication de code disparait.
+  variante?: "defaut" | "moderation";
+};
+
+export function CarteEvenement({ evenement, variante = "defaut" }: Props) {
+  if (variante === "moderation") {
+    return (
+      <Link href={`/moderation/${evenement.id}`} asChild>
+        <Pressable className="mb-3 overflow-hidden rounded-xl border border-line bg-surface active:opacity-80">
+          <Image
+            source={evenement.image}
+            style={{ width: "100%", height: 120 }}
+            contentFit="cover"
+            transition={200}
+          />
+          <View className="p-4">
+            <Text className="text-base font-medium text-ink" numberOfLines={2}>
+              {evenement.titre}
+            </Text>
+            <Text className="mt-1 text-sm text-ink-muted">
+              {formaterDateEvenement(evenement.dateDebut)} · {evenement.commune}
+            </Text>
+            <Text className="mt-1 text-xs text-ink-faint">
+              Soumis le {formaterDateEvenement(evenement.createdAt)}
+            </Text>
+          </View>
+        </Pressable>
+      </Link>
+    );
+  }
+
   return (
     <Link href={`/evenement/${evenement.id}`} asChild>
       <Pressable className="mb-3 overflow-hidden rounded-card bg-ink active:opacity-90">

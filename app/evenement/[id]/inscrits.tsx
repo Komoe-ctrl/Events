@@ -1,7 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocalSearchParams } from "expo-router";
-import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
 import { BadgeStatutReservation } from "@/components/BadgeStatutReservation";
+import { Bouton } from "@/components/Bouton";
+import { Carte } from "@/components/Carte";
+import { EtatErreur } from "@/components/EtatErreur";
+import { EtatVide } from "@/components/EtatVide";
+import { SqueletteLigne } from "@/components/Squelette";
 import { recupererEvenement } from "@/features/events/api";
 import { recupererInscrits } from "@/features/reservations/api";
 import type { ReservationOrganisateur } from "@/types/reservation";
@@ -9,9 +14,9 @@ import type { ReservationOrganisateur } from "@/types/reservation";
 function BoutonValiderBillet({ evenementId }: { evenementId: string }) {
   return (
     <Link href={`/evenement/${evenementId}/scanner`} asChild>
-      <Pressable className="mb-4 items-center rounded-card bg-brand-500 py-3 active:opacity-80">
-        <Text className="text-base font-medium text-ink">Valider un billet</Text>
-      </Pressable>
+      <Bouton variante="primaire" className="mb-4">
+        Valider un billet
+      </Bouton>
     </Link>
   );
 }
@@ -24,20 +29,20 @@ function ResumeCapacite({
   capacite: number | null;
 }) {
   return (
-    <View className="mb-4 rounded-card bg-surface p-4">
+    <Carte className="mb-4">
       <Text className="text-base font-medium text-ink">
         {capacite === null
           ? `${placesPrises} place${placesPrises > 1 ? "s" : ""} réservée${placesPrises > 1 ? "s" : ""}`
           : `${placesPrises} / ${capacite} places`}
       </Text>
-    </View>
+    </Carte>
   );
 }
 
 export default function Inscrits() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, refetch } = useQuery({
     queryKey: ["evenements", id, "inscrits"],
     queryFn: () => recupererInscrits(id),
     enabled: Boolean(id),
@@ -53,18 +58,21 @@ export default function Inscrits() {
 
   if (isPending) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-sunken">
-        <ActivityIndicator color="#B84800" />
+      <View className="flex-1 bg-surface-sunken px-4 pt-4">
+        {[1, 2, 3].map((n) => (
+          <SqueletteLigne key={n} />
+        ))}
       </View>
     );
   }
 
   if (isError) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-sunken px-8">
-        <Text className="text-center text-ink-muted">
-          Impossible de charger les inscrits. Vérifie ta connexion.
-        </Text>
+      <View className="flex-1 bg-surface-sunken">
+        <EtatErreur
+          texte="Impossible de charger les inscrits. Vérifie ta connexion."
+          onReessayer={() => refetch()}
+        />
       </View>
     );
   }
@@ -82,11 +90,7 @@ export default function Inscrits() {
           <ResumeCapacite placesPrises={placesPrises} capacite={evenement.capacite} />
         ) : null}
         <BoutonValiderBillet evenementId={id} />
-        <View className="flex-1 items-center justify-center px-4 pb-16">
-          <Text className="text-center text-ink-muted">
-            Aucune réservation pour le moment.
-          </Text>
-        </View>
+        <EtatVide icone="people-outline" texte="Aucune réservation pour le moment." />
       </View>
     );
   }
@@ -112,7 +116,7 @@ export default function Inscrits() {
 
 function LigneInscrit({ reservation }: { reservation: ReservationOrganisateur }) {
   return (
-    <View className="mb-3 rounded-card bg-surface p-4">
+    <Carte>
       <Text className="text-base font-medium text-ink">{reservation.utilisateur.nom}</Text>
       <Text className="mt-1 text-sm text-ink-muted">{reservation.utilisateur.telephone}</Text>
       <View className="mt-2 flex-row items-center justify-between">
@@ -121,6 +125,6 @@ function LigneInscrit({ reservation }: { reservation: ReservationOrganisateur })
         </Text>
         <BadgeStatutReservation statut={reservation.statut} />
       </View>
-    </View>
+    </Carte>
   );
 }
