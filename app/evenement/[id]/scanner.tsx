@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { useState } from "react";
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ChampTexte } from "@/components/ChampTexte";
 import { validerReservation } from "@/features/reservations/api";
 import { ErreurApi, ErreurReseau } from "@/lib/apiClient";
@@ -120,7 +121,7 @@ function CarteResultat({
       {resultat.type === "reseau" ? (
         <Pressable
           onPress={onReessayer}
-          className="mt-4 rounded-chip border border-line bg-surface px-4 py-2 active:opacity-70"
+          className="mt-4 min-h-[44px] items-center justify-center rounded-chip border border-line bg-surface px-4 py-2 active:opacity-70"
         >
           <Text className="text-sm font-medium text-ink">Réessayer</Text>
         </Pressable>
@@ -136,6 +137,10 @@ export default function Scanner() {
   const [dernierCodeTente, setDernierCodeTente] = useState("");
   const [resultat, setResultat] = useState<Resultat | null>(null);
   const [permission, demanderPermission] = useCameraPermissions();
+  // Header natif present (geree par _layout.tsx), mais cet ecran n'est pas
+  // dans le groupe (tabs) : aucune barre d'onglets pour absorber l'inset du
+  // bas. Compose avec le padding visuel existant, ne le remplace pas.
+  const insets = useSafeAreaInsets();
 
   // Chemin de validation unique, partage entre saisie manuelle et camera —
   // seule la source du code change, jamais la logique qui le traite.
@@ -189,7 +194,10 @@ export default function Scanner() {
   };
 
   const formulaireManuel = (
-    <View className="flex-1 bg-surface p-6">
+    <View
+      className="flex-1 bg-surface px-6 pt-6"
+      style={{ paddingBottom: 24 + insets.bottom }}
+    >
       <ChampTexte
         label="Code de la réservation"
         value={code}
@@ -235,7 +243,10 @@ export default function Scanner() {
         barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
         onBarcodeScanned={gererCodeScanne}
       />
-      <View className="bg-surface p-6">
+      <View
+        className="bg-surface px-6 pt-6"
+        style={{ paddingBottom: 24 + insets.bottom }}
+      >
         {resultat ? (
           <>
             <CarteResultat
@@ -254,7 +265,10 @@ export default function Scanner() {
             Cadre le QR code du billet.
           </Text>
         )}
-        <Pressable onPress={() => setMode("manuel")} className="mt-3 items-center py-2">
+        <Pressable
+          onPress={() => setMode("manuel")}
+          className="mt-3 min-h-[44px] items-center justify-center py-2"
+        >
           <Text className="text-sm font-medium text-ink underline">Saisir le code à la main</Text>
         </Pressable>
       </View>

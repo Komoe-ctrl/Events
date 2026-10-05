@@ -3,6 +3,7 @@ import { useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import { ActivityIndicator, Modal, Pressable, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import QRCode from "react-native-qrcode-svg";
 import {
   annulerReservation,
@@ -17,6 +18,11 @@ export default function DetailReservation() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const queryClient = useQueryClient();
   const [confirmationVisible, setConfirmationVisible] = useState(false);
+  // Header natif present (geree par _layout.tsx), mais cet ecran n'est pas
+  // dans le groupe (tabs) : aucune barre d'onglets pour absorber l'inset du
+  // bas. Compose avec le padding visuel existant (p-6 = 24px), ne le
+  // remplace pas.
+  const insets = useSafeAreaInsets();
 
   // Source principale : le reseau, a jour (statut peut avoir change entre
   // temps, ex. UTILISEE apres un scan). Marche aussi sans reseau : source
@@ -71,7 +77,10 @@ export default function DetailReservation() {
     // blanc. Le QR et le code de secours restent en blanc/noir purs, jamais
     // teintes par la palette — la lisibilite prime sur l'identite visuelle
     // ici precisement.
-    <View className="flex-1 bg-ink p-6">
+    <View
+      className="flex-1 bg-ink px-6 pt-6"
+      style={{ paddingBottom: 24 + insets.bottom }}
+    >
       <StatusBar style="light" />
       {reservation.evenement ? (
         <View>
@@ -141,7 +150,7 @@ export default function DetailReservation() {
             <View className="mt-5 flex-row justify-end gap-3">
               <Pressable
                 onPress={() => setConfirmationVisible(false)}
-                className="rounded-chip px-4 py-2 active:opacity-70"
+                className="min-h-[44px] items-center justify-center rounded-chip px-4 py-2 active:opacity-70"
               >
                 <Text className="text-base text-ink">Non</Text>
               </Pressable>
@@ -150,7 +159,7 @@ export default function DetailReservation() {
                   setConfirmationVisible(false);
                   mutationAnnulation.mutate();
                 }}
-                className="rounded-chip bg-red-600 px-4 py-2 active:opacity-80"
+                className="min-h-[44px] items-center justify-center rounded-chip bg-red-600 px-4 py-2 active:opacity-80"
               >
                 <Text className="text-base font-medium text-white">
                   Annuler la réservation

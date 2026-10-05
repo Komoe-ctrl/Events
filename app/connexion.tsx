@@ -89,8 +89,12 @@ export default function Connexion() {
 
       {/* Navigation secondaire, pas l'action primaire de cet ecran :
           soulignee plutot que coloree (regle de discipline couleur). */}
-      <Link href="/inscription" replace className="mt-4 text-center text-sm text-ink underline">
-        Pas encore de compte ? Crée-en un
+      <Link href="/inscription" replace asChild>
+        <Pressable hitSlop={12} className="mt-4 items-center">
+          <Text className="text-center text-sm text-ink underline">
+            Pas encore de compte ? Crée-en un
+          </Text>
+        </Pressable>
       </Link>
     </ScrollView>
   );
