@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
 import { useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
@@ -45,6 +46,10 @@ export default function DetailReservation() {
   const mutationAnnulation = useMutation({
     mutationFn: () => annulerReservation(id),
     onSuccess: (annulee) => {
+      // Warning, pas Success : l'action a reussi, mais annuler reste une
+      // perte (la place), pas un accomplissement — meme nuance que pour le
+      // scan d'un billet deja utilise/annule.
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       queryClient.invalidateQueries({ queryKey: ["reservations", "moi"] });
       queryClient.invalidateQueries({ queryKey: ["evenement", annulee.evenementId] });
       revenirOuAller("/mes-reservations");

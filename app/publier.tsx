@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { Bouton } from "@/components/Bouton";
 import { EtatVide } from "@/components/EtatVide";
 import {
@@ -63,16 +63,25 @@ export default function Publier() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-surface" contentContainerClassName="p-6">
-      <FormulaireEvenement valeurs={valeurs} onChange={setValeurs} erreurs={erreurs} />
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1">
+      <ScrollView
+        className="flex-1 bg-surface"
+        contentContainerClassName="p-6"
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+      >
+        <Pressable onPress={Keyboard.dismiss}>
+          <FormulaireEvenement valeurs={valeurs} onChange={setValeurs} erreurs={erreurs} />
 
-      {erreurGenerale ? (
-        <Text className="mb-4 text-sm text-red-600">{erreurGenerale}</Text>
-      ) : null}
+          {erreurGenerale ? (
+            <Text className="mb-4 text-sm text-red-600">{erreurGenerale}</Text>
+          ) : null}
 
-      <Bouton onPress={soumettre} chargement={mutation.isPending}>
-        Publier
-      </Bouton>
-    </ScrollView>
+          <Bouton onPress={soumettre} chargement={mutation.isPending}>
+            Publier
+          </Bouton>
+        </Pressable>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

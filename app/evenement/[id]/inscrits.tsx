@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useLocalSearchParams } from "expo-router";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, RefreshControl, Text, View } from "react-native";
 import { BadgeStatutReservation } from "@/components/BadgeStatutReservation";
 import { Bouton } from "@/components/Bouton";
 import { Carte } from "@/components/Carte";
@@ -42,7 +42,7 @@ function ResumeCapacite({
 export default function Inscrits() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const { data, isPending, isError, refetch } = useQuery({
+  const { data, isPending, isError, isFetching, refetch } = useQuery({
     queryKey: ["evenements", id, "inscrits"],
     queryFn: () => recupererInscrits(id),
     enabled: Boolean(id),
@@ -101,6 +101,9 @@ export default function Inscrits() {
       contentContainerClassName="px-4 pt-4 pb-8"
       data={data}
       keyExtractor={(item) => item.id}
+      refreshControl={
+        <RefreshControl refreshing={isFetching} onRefresh={() => refetch()} tintColor="#B84800" />
+      }
       ListHeaderComponent={
         <>
           {evenement ? (

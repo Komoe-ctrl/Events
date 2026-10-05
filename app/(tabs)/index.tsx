@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, RefreshControl, Text, View } from "react-native";
 import { CarteEvenement } from "@/components/CarteEvenement";
 import { EtatErreur } from "@/components/EtatErreur";
 import { EtatVide } from "@/components/EtatVide";
@@ -14,7 +14,7 @@ export default function AutourDeMoi() {
   // sont connus ; sans position, l'API renvoie les evenements sans distance.
   const coordonnees = position.statut === "ok" ? { lat: position.latitude, lng: position.longitude } : null;
 
-  const { data, isPending, isError, refetch } = useQuery({
+  const { data, isPending, isError, isFetching, refetch } = useQuery({
     queryKey: ["evenements", coordonnees],
     queryFn: () => recupererEvenements(coordonnees ?? {}),
   });
@@ -51,6 +51,9 @@ export default function AutourDeMoi() {
       data={evenements}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => <CarteEvenement evenement={item} />}
+      refreshControl={
+        <RefreshControl refreshing={isFetching} onRefresh={() => refetch()} tintColor="#B84800" />
+      }
       ListHeaderComponent={
         position.statut === "refuse" ? (
           // Notice, pas une action : l'accent est reserve aux actions

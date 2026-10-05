@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text } from "react-native";
+import {
+  ActivityIndicator,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+} from "react-native";
 import { Link } from "expo-router";
 import { ChampTexte } from "@/components/ChampTexte";
 import { useAuth } from "@/features/auth/AuthContext";
@@ -53,49 +61,63 @@ export default function Connexion() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-surface" contentContainerClassName="p-6">
-      <Text className="mb-6 font-display text-display text-ink">Connexion</Text>
-
-      <ChampTexte
-        label="Numéro de téléphone"
-        value={telephone}
-        onChangeText={setTelephone}
-        keyboardType="phone-pad"
-        autoComplete="tel"
-        placeholder="07 00 00 00 00"
-        erreur={erreurTelephone}
-      />
-      <ChampTexte
-        label="Mot de passe"
-        value={motDePasse}
-        onChangeText={setMotDePasse}
-        secureTextEntry
-        autoComplete="password"
-      />
-
-      {erreurGenerale ? <Text className="mb-4 text-sm text-red-600">{erreurGenerale}</Text> : null}
-
-      <Pressable
-        onPress={soumettre}
-        disabled={enCours}
-        className="items-center rounded-card bg-brand-500 py-3 active:opacity-80 disabled:opacity-50"
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1">
+      <ScrollView
+        className="flex-1 bg-surface"
+        contentContainerClassName="p-6"
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
       >
-        {enCours ? (
-          <ActivityIndicator color="#1A1410" />
-        ) : (
-          <Text className="text-base font-medium text-ink">Se connecter</Text>
-        )}
-      </Pressable>
+        {/* Un appui en dehors d'un champ ferme le clavier, sans bloquer les
+            boutons/liens (ce Pressable ne capte que les appuis qui n'ont ete
+            pris par aucun enfant). */}
+        <Pressable onPress={Keyboard.dismiss}>
+          <Text className="mb-6 font-display text-display text-ink">Connexion</Text>
 
-      {/* Navigation secondaire, pas l'action primaire de cet ecran :
-          soulignee plutot que coloree (regle de discipline couleur). */}
-      <Link href="/inscription" replace asChild>
-        <Pressable hitSlop={12} className="mt-4 items-center">
-          <Text className="text-center text-sm text-ink underline">
-            Pas encore de compte ? Crée-en un
-          </Text>
+          <ChampTexte
+            label="Numéro de téléphone"
+            value={telephone}
+            onChangeText={setTelephone}
+            keyboardType="phone-pad"
+            autoComplete="tel"
+            placeholder="07 00 00 00 00"
+            erreur={erreurTelephone}
+          />
+          <ChampTexte
+            label="Mot de passe"
+            value={motDePasse}
+            onChangeText={setMotDePasse}
+            secureTextEntry
+            autoComplete="password"
+          />
+
+          {erreurGenerale ? (
+            <Text className="mb-4 text-sm text-red-600">{erreurGenerale}</Text>
+          ) : null}
+
+          <Pressable
+            onPress={soumettre}
+            disabled={enCours}
+            className="items-center rounded-card bg-brand-500 py-3 active:opacity-80 disabled:opacity-50"
+          >
+            {enCours ? (
+              <ActivityIndicator color="#1A1410" />
+            ) : (
+              <Text className="text-base font-medium text-ink">Se connecter</Text>
+            )}
+          </Pressable>
+
+          {/* Navigation secondaire, pas l'action primaire de cet ecran :
+              soulignee plutot que coloree (regle de discipline couleur). */}
+          <Link href="/inscription" replace asChild>
+            <Pressable hitSlop={12} className="mt-4 items-center">
+              <Text className="text-center text-sm text-ink underline">
+                Pas encore de compte ? Crée-en un
+              </Text>
+            </Pressable>
+          </Link>
         </Pressable>
-      </Link>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

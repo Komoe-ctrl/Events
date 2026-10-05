@@ -1,8 +1,17 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CameraView, useCameraPermissions } from "expo-camera";
+import * as Haptics from "expo-haptics";
 import { useState } from "react";
-import { ActivityIndicator, Pressable, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  Text,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ChampTexte } from "@/components/ChampTexte";
 import { validerReservation } from "@/features/reservations/api";
@@ -147,6 +156,9 @@ export default function Scanner() {
   const mutation = useMutation({
     mutationFn: (code: string) => validerReservation(code),
     onSuccess: (reservation) => {
+      // Action importante (CLAUDE.md) : confirme le scan sans que
+      // l'organisateur ait besoin de regarder l'ecran a chaque billet.
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setResultat({ type: "succes", reservation });
       setCode("");
       queryClient.invalidateQueries({
@@ -154,6 +166,10 @@ export default function Scanner() {
       });
     },
     onError: (e) => {
+      // Tout echec (deja utilise, annule, introuvable, reseau...) : meme
+      // retour "billet invalide", l'organisateur n'a pas besoin de
+      // distinguer la cause au toucher, juste de savoir que ca n'est pas bon.
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       setResultat(resultatDepuisErreur(e));
     },
   });
@@ -194,41 +210,47 @@ export default function Scanner() {
   };
 
   const formulaireManuel = (
-    <View
-      className="flex-1 bg-surface px-6 pt-6"
-      style={{ paddingBottom: 24 + insets.bottom }}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      className="flex-1"
     >
-      <ChampTexte
-        label="Code de la réservation"
-        value={code}
-        onChangeText={setCode}
-        autoCapitalize="characters"
-        placeholder="AG3NEB98"
-      />
-
       <Pressable
-        onPress={valider}
-        disabled={mutation.isPending}
-        className="items-center rounded-card bg-brand-500 py-3 active:opacity-80 disabled:opacity-50"
+        onPress={Keyboard.dismiss}
+        className="flex-1 bg-surface px-6 pt-6"
+        style={{ paddingBottom: 24 + insets.bottom }}
       >
-        {mutation.isPending ? (
-          <ActivityIndicator color="#1A1410" />
-        ) : (
-          <Text className="text-base font-medium text-ink">Valider</Text>
-        )}
-      </Pressable>
+        <ChampTexte
+          label="Code de la réservation"
+          value={code}
+          onChangeText={setCode}
+          autoCapitalize="characters"
+          placeholder="AG3NEB98"
+        />
 
-      <Pressable
-        onPress={passerEnModeCamera}
-        className="mt-3 items-center rounded-card border border-line py-3 active:opacity-70"
-      >
-        <Text className="text-base font-medium text-ink">Scanner avec la caméra</Text>
-      </Pressable>
+        <Pressable
+          onPress={valider}
+          disabled={mutation.isPending}
+          className="items-center rounded-card bg-brand-500 py-3 active:opacity-80 disabled:opacity-50"
+        >
+          {mutation.isPending ? (
+            <ActivityIndicator color="#1A1410" />
+          ) : (
+            <Text className="text-base font-medium text-ink">Valider</Text>
+          )}
+        </Pressable>
 
-      {resultat ? (
-        <CarteResultat resultat={resultat} onReessayer={() => soumettreCode(dernierCodeTente)} />
-      ) : null}
-    </View>
+        <Pressable
+          onPress={passerEnModeCamera}
+          className="mt-3 items-center rounded-card border border-line py-3 active:opacity-70"
+        >
+          <Text className="text-base font-medium text-ink">Scanner avec la caméra</Text>
+        </Pressable>
+
+        {resultat ? (
+          <CarteResultat resultat={resultat} onReessayer={() => soumettreCode(dernierCodeTente)} />
+        ) : null}
+      </Pressable>
+    </KeyboardAvoidingView>
   );
 
   if (mode === "manuel") {

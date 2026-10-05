@@ -2,7 +2,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { ChampTexte } from "@/components/ChampTexte";
 import { EtatErreur } from "@/components/EtatErreur";
 import { SqueletteDetailEvenement } from "@/components/Squelette";
@@ -90,83 +99,100 @@ export default function DetailModeration() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-surface">
-      <Image
-        source={evenement.image}
-        style={{ width: "100%", height: 220 }}
-        contentFit="cover"
-      />
-      <View className="p-5">
-        <Text className="text-xs font-medium uppercase text-ink-faint">
-          {LIBELLES_CATEGORIE[evenement.categorie] ?? evenement.categorie}
-        </Text>
-        <Text className="mt-1 text-xl font-medium text-ink">{evenement.titre}</Text>
-        <Text className="mt-2 text-sm text-ink-muted">
-          {formaterDateEvenement(evenement.dateDebut)}
-          {evenement.dateFin ? ` → ${formaterDateEvenement(evenement.dateFin)}` : ""}
-        </Text>
-        <Text className="mt-1 text-sm text-ink-muted">
-          {evenement.adresse}, {evenement.commune}
-        </Text>
-
-        <View className="mt-4 flex-row gap-4">
-          <Text className="text-sm text-ink">
-            {evenement.prix === null ? "Gratuit" : `${evenement.prix.toLocaleString("fr-FR")} FCFA`}
-          </Text>
-          <Text className="text-sm text-ink">
-            {evenement.capacite === null ? "Capacité illimitée" : `${evenement.capacite} places`}
-          </Text>
-        </View>
-
-        <Text className="mt-5 text-base leading-6 text-ink">{evenement.description}</Text>
-
-        <View className="mt-6 rounded-xl border border-line bg-surface-sunken p-4">
-          <Text className="text-xs font-medium uppercase text-ink-faint">Contact organisateur</Text>
-          <Text className="mt-1 text-sm text-ink">{evenement.contactOrganisateur}</Text>
-        </View>
-
-        <Text className="mt-4 text-xs text-ink-faint">
-          Soumis le {formaterDateEvenement(evenement.createdAt)}
-        </Text>
-
-        <Pressable
-          onPress={() => {
-            setErreur(undefined);
-            mutation.mutate({ statut: "PUBLIE" });
-          }}
-          disabled={mutation.isPending}
-          className="mt-8 items-center rounded-xl bg-brand-600 py-3 active:opacity-80 disabled:opacity-50"
-        >
-          {mutation.isPending ? (
-            <ActivityIndicator color="#FFFFFF" />
-          ) : (
-            <Text className="text-base font-medium text-white">Approuver</Text>
-          )}
-        </Pressable>
-
-        <View className="mt-6">
-          <ChampTexte
-            label="Motif du refus"
-            value={motifRefus}
-            onChangeText={setMotifRefus}
-            multiline
-            numberOfLines={3}
-            placeholder="Pourquoi cet événement n'est pas publié…"
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1">
+      <ScrollView
+        className="flex-1 bg-surface"
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+      >
+        {/* Un appui en dehors d'un champ ferme le clavier, sans bloquer les
+            boutons (ce Pressable ne capte que les appuis qui n'ont ete pris
+            par aucun enfant). */}
+        <Pressable onPress={Keyboard.dismiss}>
+          <Image
+            source={evenement.image}
+            style={{ width: "100%", height: 220 }}
+            contentFit="cover"
           />
-          <Pressable
-            onPress={() => {
-              setErreur(undefined);
-              mutation.mutate({ statut: "REFUSE", motifRefus: motifRefus.trim() });
-            }}
-            disabled={mutation.isPending || motifRefus.trim().length === 0}
-            className="items-center rounded-xl border border-red-300 py-3 active:opacity-70 disabled:opacity-40"
-          >
-            <Text className="text-base font-medium text-red-700">Refuser</Text>
-          </Pressable>
-        </View>
+          <View className="p-5">
+            <Text className="text-xs font-medium uppercase text-ink-faint">
+              {LIBELLES_CATEGORIE[evenement.categorie] ?? evenement.categorie}
+            </Text>
+            <Text className="mt-1 text-xl font-medium text-ink">{evenement.titre}</Text>
+            <Text className="mt-2 text-sm text-ink-muted">
+              {formaterDateEvenement(evenement.dateDebut)}
+              {evenement.dateFin ? ` → ${formaterDateEvenement(evenement.dateFin)}` : ""}
+            </Text>
+            <Text className="mt-1 text-sm text-ink-muted">
+              {evenement.adresse}, {evenement.commune}
+            </Text>
 
-        {erreur ? <Text className="mt-4 text-sm text-red-600">{erreur}</Text> : null}
-      </View>
-    </ScrollView>
+            <View className="mt-4 flex-row gap-4">
+              <Text className="text-sm text-ink">
+                {evenement.prix === null
+                  ? "Gratuit"
+                  : `${evenement.prix.toLocaleString("fr-FR")} FCFA`}
+              </Text>
+              <Text className="text-sm text-ink">
+                {evenement.capacite === null
+                  ? "Capacité illimitée"
+                  : `${evenement.capacite} places`}
+              </Text>
+            </View>
+
+            <Text className="mt-5 text-base leading-6 text-ink">{evenement.description}</Text>
+
+            <View className="mt-6 rounded-xl border border-line bg-surface-sunken p-4">
+              <Text className="text-xs font-medium uppercase text-ink-faint">
+                Contact organisateur
+              </Text>
+              <Text className="mt-1 text-sm text-ink">{evenement.contactOrganisateur}</Text>
+            </View>
+
+            <Text className="mt-4 text-xs text-ink-faint">
+              Soumis le {formaterDateEvenement(evenement.createdAt)}
+            </Text>
+
+            <Pressable
+              onPress={() => {
+                setErreur(undefined);
+                mutation.mutate({ statut: "PUBLIE" });
+              }}
+              disabled={mutation.isPending}
+              className="mt-8 items-center rounded-xl bg-brand-600 py-3 active:opacity-80 disabled:opacity-50"
+            >
+              {mutation.isPending ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text className="text-base font-medium text-white">Approuver</Text>
+              )}
+            </Pressable>
+
+            <View className="mt-6">
+              <ChampTexte
+                label="Motif du refus"
+                value={motifRefus}
+                onChangeText={setMotifRefus}
+                multiline
+                numberOfLines={3}
+                placeholder="Pourquoi cet événement n'est pas publié…"
+              />
+              <Pressable
+                onPress={() => {
+                  setErreur(undefined);
+                  mutation.mutate({ statut: "REFUSE", motifRefus: motifRefus.trim() });
+                }}
+                disabled={mutation.isPending || motifRefus.trim().length === 0}
+                className="items-center rounded-xl border border-red-300 py-3 active:opacity-70 disabled:opacity-40"
+              >
+                <Text className="text-base font-medium text-red-700">Refuser</Text>
+              </Pressable>
+            </View>
+
+            {erreur ? <Text className="mt-4 text-sm text-red-600">{erreur}</Text> : null}
+          </View>
+        </Pressable>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
