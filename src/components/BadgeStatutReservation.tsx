@@ -1,22 +1,15 @@
-import { Text } from "react-native";
+import { Etiquette, type CouleurEtiquette } from "@/components/Etiquette";
 import type { StatutReservation } from "@/types/reservation";
 
-// Palette semantique distincte de l'accent (regle de discipline couleur) :
-// CONFIRMEE utilisait bg-brand-50, recycle desormais la meme famille verte
-// que PUBLIE ("etat actif/valide"), pas l'orange.
-const STYLES: Record<StatutReservation, { classe: string; libelle: string }> = {
-  CONFIRMEE: { classe: "bg-green-50 text-green-700", libelle: "Confirmée" },
-  UTILISEE: { classe: "bg-surface-sunken text-ink-muted", libelle: "Utilisée" },
-  // text-ink-muted, pas text-ink-faint : meme raison que UTILISEE, faint ne
-  // tient plus 4.5:1 sur bg-surface-sunken depuis son assombrissement.
-  ANNULEE: { classe: "bg-surface-sunken text-ink-muted", libelle: "Annulée" },
+const STYLES: Record<StatutReservation, { couleur: CouleurEtiquette; libelle: string }> = {
+  CONFIRMEE: { couleur: "succes", libelle: "Confirmée" },
+  UTILISEE: { couleur: "neutre", libelle: "Utilisée" },
+  // Neutre, pas erreur : une annulation n'est pas une erreur, juste un etat
+  // terminal parmi d'autres (meme traitement qu'UTILISEE, deliberement).
+  ANNULEE: { couleur: "neutre", libelle: "Annulée" },
 };
 
 export function BadgeStatutReservation({ statut }: { statut: StatutReservation }) {
-  const { classe, libelle } = STYLES[statut];
-  return (
-    <Text className={`overflow-hidden rounded-full px-2 py-1 text-xs font-medium ${classe}`}>
-      {libelle}
-    </Text>
-  );
+  const { couleur, libelle } = STYLES[statut];
+  return <Etiquette couleur={couleur} libelle={libelle} />;
 }

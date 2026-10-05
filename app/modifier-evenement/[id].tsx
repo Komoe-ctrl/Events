@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
+import { Bouton } from "@/components/Bouton";
+import { EtatErreur } from "@/components/EtatErreur";
 import {
   FormulaireEvenement,
   valeursDepuisEvenement,
@@ -10,6 +12,7 @@ import {
   type ErreursFormulaireEvenement,
   type ValeursFormulaireEvenement,
 } from "@/components/FormulaireEvenement";
+import { Squelette } from "@/components/Squelette";
 import { modifierEvenement, recupererMesEvenements } from "@/features/events/api";
 import { ErreurApi, ErreurReseau } from "@/lib/apiClient";
 import { revenirOuAller } from "@/lib/navigation";
@@ -18,7 +21,7 @@ export default function ModifierEvenement() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const queryClient = useQueryClient();
 
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, refetch } = useQuery({
     queryKey: ["evenements", "moi"],
     queryFn: recupererMesEvenements,
   });
@@ -65,18 +68,24 @@ export default function ModifierEvenement() {
 
   if (isPending || !initialise) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface">
-        <ActivityIndicator color="#B84800" />
+      <View className="flex-1 gap-4 bg-surface p-6">
+        <Squelette hauteur={14} largeur="30%" />
+        <Squelette hauteur={48} />
+        <Squelette hauteur={14} largeur="30%" />
+        <Squelette hauteur={48} />
+        <Squelette hauteur={14} largeur="30%" />
+        <Squelette hauteur={96} />
       </View>
     );
   }
 
   if (isError || !evenement) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface px-8">
-        <Text className="text-center text-ink-muted">
-          {isError ? "Impossible de charger cet événement." : "Événement introuvable."}
-        </Text>
+      <View className="flex-1 bg-surface">
+        <EtatErreur
+          texte={isError ? "Impossible de charger cet événement." : "Événement introuvable."}
+          onReessayer={isError ? () => refetch() : undefined}
+        />
       </View>
     );
   }
@@ -89,17 +98,9 @@ export default function ModifierEvenement() {
         <Text className="mb-4 text-sm text-red-600">{erreurGenerale}</Text>
       ) : null}
 
-      <Pressable
-        onPress={soumettre}
-        disabled={mutation.isPending}
-        className="items-center rounded-card bg-brand-500 py-3 active:opacity-80 disabled:opacity-50"
-      >
-        {mutation.isPending ? (
-          <ActivityIndicator color="#1A1410" />
-        ) : (
-          <Text className="text-base font-medium text-ink">Enregistrer les modifications</Text>
-        )}
-      </Pressable>
+      <Bouton onPress={soumettre} chargement={mutation.isPending}>
+        Enregistrer les modifications
+      </Bouton>
     </ScrollView>
   );
 }

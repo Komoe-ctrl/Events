@@ -1,41 +1,46 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "expo-router";
-import { ActivityIndicator, Pressable, SectionList, Text, View } from "react-native";
+import { SectionList, Text, View } from "react-native";
 import { BadgeStatutReservation } from "@/components/BadgeStatutReservation";
+import { Carte } from "@/components/Carte";
+import { EtatErreur } from "@/components/EtatErreur";
+import { EtatVide } from "@/components/EtatVide";
+import { SqueletteLigne } from "@/components/Squelette";
 import { recupererMesReservations } from "@/features/reservations/api";
 import { formaterDateEvenement } from "@/lib/date";
 import type { Reservation } from "@/types/reservation";
 
 export default function MesReservations() {
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, refetch } = useQuery({
     queryKey: ["reservations", "moi"],
     queryFn: recupererMesReservations,
   });
 
   if (isPending) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-sunken">
-        <ActivityIndicator color="#B84800" />
+      <View className="flex-1 bg-surface-sunken px-4 pt-4">
+        {[1, 2, 3].map((n) => (
+          <SqueletteLigne key={n} />
+        ))}
       </View>
     );
   }
 
   if (isError) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-sunken px-8">
-        <Text className="text-center text-ink-muted">
-          Impossible de charger tes réservations. Vérifie ta connexion.
-        </Text>
+      <View className="flex-1 bg-surface-sunken">
+        <EtatErreur
+          texte="Impossible de charger tes réservations. Vérifie ta connexion."
+          onReessayer={() => refetch()}
+        />
       </View>
     );
   }
 
   if (data.length === 0) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-sunken px-8">
-        <Text className="text-center text-ink-muted">
-          Tes réservations apparaîtront ici.
-        </Text>
+      <View className="flex-1 bg-surface-sunken">
+        <EtatVide icone="ticket-outline" texte="Tes réservations apparaîtront ici." />
       </View>
     );
   }
@@ -75,7 +80,7 @@ export default function MesReservations() {
 function CarteReservation({ reservation }: { reservation: Reservation }) {
   return (
     <Link href={`/reservation/${reservation.id}`} asChild>
-      <Pressable className="mb-3 rounded-card bg-surface p-4 active:opacity-70">
+      <Carte>
         <Text className="text-base font-medium text-ink" numberOfLines={2}>
           {reservation.evenement?.titre ?? "Événement"}
         </Text>
@@ -91,7 +96,7 @@ function CarteReservation({ reservation }: { reservation: Reservation }) {
           </Text>
           <BadgeStatutReservation statut={reservation.statut} />
         </View>
-      </Pressable>
+      </Carte>
     </Link>
   );
 }

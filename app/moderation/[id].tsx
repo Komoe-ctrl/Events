@@ -4,6 +4,8 @@ import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { ChampTexte } from "@/components/ChampTexte";
+import { EtatErreur } from "@/components/EtatErreur";
+import { SqueletteDetailEvenement } from "@/components/Squelette";
 import { modererEvenement, recupererEvenementsAModerer } from "@/features/events/api";
 import { ErreurApi, ErreurReseau } from "@/lib/apiClient";
 import { formaterDateEvenement } from "@/lib/date";
@@ -28,7 +30,13 @@ export default function DetailModeration() {
   // (GET /admin/evenements) donne deja l'evenement en entier, et la fiche
   // publique ne renvoie jamais un EN_ATTENTE (trouverPublicParId filtre sur
   // PUBLIE). Meme repli que modifier-evenement/[id].tsx.
-  const { data, isPending, isError, error: erreurChargement } = useQuery({
+  const {
+    data,
+    isPending,
+    isError,
+    error: erreurChargement,
+    refetch,
+  } = useQuery({
     queryKey: ["evenements", "moderation"],
     queryFn: recupererEvenementsAModerer,
   });
@@ -53,8 +61,8 @@ export default function DetailModeration() {
 
   if (isPending) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface">
-        <ActivityIndicator color="#B84800" />
+      <View className="flex-1 bg-surface">
+        <SqueletteDetailEvenement />
       </View>
     );
   }
@@ -66,14 +74,17 @@ export default function DetailModeration() {
     // un refus explicite, pas un message qui laisse croire a une panne.
     const accesRefuse = erreurChargement instanceof ErreurApi && erreurChargement.code === "ACCES_REFUSE";
     return (
-      <View className="flex-1 items-center justify-center bg-surface px-8">
-        <Text className="text-center text-ink-muted">
-          {accesRefuse
-            ? "Cet écran est réservé aux administrateurs."
-            : isError
-              ? "Impossible de charger cet événement."
-              : "Événement introuvable ou déjà modéré."}
-        </Text>
+      <View className="flex-1 bg-surface">
+        <EtatErreur
+          texte={
+            accesRefuse
+              ? "Cet écran est réservé aux administrateurs."
+              : isError
+                ? "Impossible de charger cet événement."
+                : "Événement introuvable ou déjà modéré."
+          }
+          onReessayer={!accesRefuse && isError ? () => refetch() : undefined}
+        />
       </View>
     );
   }

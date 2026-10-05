@@ -1,6 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { ActivityIndicator, FlatList, Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
 import { CarteEvenement } from "@/components/CarteEvenement";
+import { EtatErreur } from "@/components/EtatErreur";
+import { EtatVide } from "@/components/EtatVide";
+import { SqueletteCarteEvenement } from "@/components/Squelette";
 import { recupererEvenements } from "@/features/events/api";
 import { usePosition } from "@/lib/usePosition";
 
@@ -11,7 +14,7 @@ export default function AutourDeMoi() {
   // sont connus ; sans position, l'API renvoie les evenements sans distance.
   const coordonnees = position.statut === "ok" ? { lat: position.latitude, lng: position.longitude } : null;
 
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, refetch } = useQuery({
     queryKey: ["evenements", coordonnees],
     queryFn: () => recupererEvenements(coordonnees ?? {}),
   });
@@ -20,18 +23,21 @@ export default function AutourDeMoi() {
 
   if (isPending) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-sunken">
-        <ActivityIndicator color="#B84800" />
+      <View className="flex-1 bg-surface-sunken px-4 pt-4">
+        {[1, 2, 3].map((n) => (
+          <SqueletteCarteEvenement key={n} />
+        ))}
       </View>
     );
   }
 
   if (isError) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-sunken px-8">
-        <Text className="text-center text-ink-muted">
-          Impossible de charger les événements. Vérifie ta connexion.
-        </Text>
+      <View className="flex-1 bg-surface-sunken">
+        <EtatErreur
+          texte="Impossible de charger les événements. Vérifie ta connexion."
+          onReessayer={() => refetch()}
+        />
       </View>
     );
   }
@@ -39,7 +45,9 @@ export default function AutourDeMoi() {
   return (
     <FlatList
       className="bg-surface-sunken"
-      contentContainerClassName="px-4 pt-4 pb-8"
+      // flex-grow : sans ca, ListEmptyComponent (EtatVide, qui se centre via
+      // flex-1) ne remplit pas la hauteur disponible et se tasse en haut.
+      contentContainerClassName="flex-grow px-4 pt-4 pb-8"
       data={evenements}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => <CarteEvenement evenement={item} />}
@@ -57,9 +65,7 @@ export default function AutourDeMoi() {
         ) : null
       }
       ListEmptyComponent={
-        <Text className="mt-16 text-center text-ink-muted">
-          Aucun événement pour le moment.
-        </Text>
+        <EtatVide icone="compass-outline" texte="Aucun événement pour le moment." />
       }
     />
   );

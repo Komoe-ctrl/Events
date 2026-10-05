@@ -1,40 +1,46 @@
 import { Link } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
-import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
+import { Carte } from "@/components/Carte";
+import { Etiquette, type CouleurEtiquette } from "@/components/Etiquette";
+import { EtatErreur } from "@/components/EtatErreur";
+import { EtatVide } from "@/components/EtatVide";
+import { SqueletteLigne } from "@/components/Squelette";
 import { recupererMesEvenements } from "@/features/events/api";
 import { formaterDateEvenement } from "@/lib/date";
 import type { Evenement, StatutEvenement } from "@/types/event";
 
 export default function MesEvenements() {
-  const { data, isPending, isError } = useQuery({
+  const { data, isPending, isError, refetch } = useQuery({
     queryKey: ["evenements", "moi"],
     queryFn: recupererMesEvenements,
   });
 
   if (isPending) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-sunken">
-        <ActivityIndicator color="#B84800" />
+      <View className="flex-1 bg-surface-sunken px-4 pt-4">
+        {[1, 2, 3].map((n) => (
+          <SqueletteLigne key={n} />
+        ))}
       </View>
     );
   }
 
   if (isError) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-sunken px-8">
-        <Text className="text-center text-ink-muted">
-          Impossible de charger tes événements. Vérifie ta connexion.
-        </Text>
+      <View className="flex-1 bg-surface-sunken">
+        <EtatErreur
+          texte="Impossible de charger tes événements. Vérifie ta connexion."
+          onReessayer={() => refetch()}
+        />
       </View>
     );
   }
 
   if (data.length === 0) {
     return (
-      <View className="flex-1 items-center justify-center bg-surface-sunken px-8">
-        <Text className="text-center text-ink-muted">
-          Tes événements publiés apparaîtront ici.
-        </Text>
+      <View className="flex-1 bg-surface-sunken">
+        <EtatVide icone="calendar-outline" texte="Tes événements publiés apparaîtront ici." />
       </View>
     );
   }
@@ -54,7 +60,7 @@ function CarteEvenementOrganisateur({ evenement }: { evenement: Evenement }) {
   const modifiable = evenement.statut === "BROUILLON" || evenement.statut === "EN_ATTENTE";
 
   const contenu = (
-    <View className="mb-3 rounded-card bg-surface p-4">
+    <Carte>
       <Text className="text-base font-medium text-ink" numberOfLines={2}>
         {evenement.titre}
       </Text>
@@ -75,13 +81,13 @@ function CarteEvenementOrganisateur({ evenement }: { evenement: Evenement }) {
       {evenement.statut === "REFUSE" && evenement.motifRefus ? (
         <Text className="mt-2 text-sm text-red-600">Motif : {evenement.motifRefus}</Text>
       ) : null}
-    </View>
+    </Carte>
   );
 
   if (modifiable) {
     return (
       <Link href={`/modifier-evenement/${evenement.id}`} asChild>
-        <Pressable className="active:opacity-70">{contenu}</Pressable>
+        {contenu}
       </Link>
     );
   }
@@ -89,7 +95,7 @@ function CarteEvenementOrganisateur({ evenement }: { evenement: Evenement }) {
   if (evenement.statut === "PUBLIE") {
     return (
       <Link href={`/evenement/${evenement.id}/inscrits`} asChild>
-        <Pressable className="active:opacity-70">{contenu}</Pressable>
+        {contenu}
       </Link>
     );
   }
@@ -98,23 +104,15 @@ function CarteEvenementOrganisateur({ evenement }: { evenement: Evenement }) {
 }
 
 function BadgeStatut({ statut }: { statut: StatutEvenement }) {
-  const styles: Record<StatutEvenement, { classe: string; libelle: string }> = {
-    // text-ink-muted, pas text-ink-faint : ce badge utilise bg-surface-sunken
-    // comme propre fond, et faint n'y tient plus 4.5:1 depuis que sunken a
-    // ete assombri (regle de contraste).
-    BROUILLON: { classe: "bg-surface-sunken text-ink-muted", libelle: "Brouillon" },
-    // Palette semantique distincte de l'accent : chaque statut a sa propre
-    // famille de couleur, aucune ne recycle l'orange (regle de discipline
-    // couleur). Bleu plutot qu'amber : trop proche de l'orange en teinte,
-    // et "en attente" est un etat neutre/informatif, pas un avertissement.
-    EN_ATTENTE: { classe: "bg-blue-50 text-blue-700", libelle: "En attente de modération" },
-    PUBLIE: { classe: "bg-green-50 text-green-700", libelle: "Publié" },
-    REFUSE: { classe: "bg-red-50 text-red-700", libelle: "Refusé" },
+  const styles: Record<StatutEvenement, { couleur: CouleurEtiquette; libelle: string }> = {
+    BROUILLON: { couleur: "neutre", libelle: "Brouillon" },
+    // Bleu (info) plutot qu'attention (ambre) : trop proche de l'orange
+    // brand en teinte, et "en attente" est un etat neutre/informatif, pas
+    // un avertissement (regle de discipline couleur).
+    EN_ATTENTE: { couleur: "info", libelle: "En attente de modération" },
+    PUBLIE: { couleur: "succes", libelle: "Publié" },
+    REFUSE: { couleur: "erreur", libelle: "Refusé" },
   };
-  const { classe, libelle } = styles[statut];
-  return (
-    <Text className={`overflow-hidden rounded-full px-2 py-1 text-xs font-medium ${classe}`}>
-      {libelle}
-    </Text>
-  );
+  const { couleur, libelle } = styles[statut];
+  return <Etiquette couleur={couleur} libelle={libelle} />;
 }
