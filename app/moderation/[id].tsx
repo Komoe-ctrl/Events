@@ -54,7 +54,7 @@ export default function DetailModeration() {
   if (isPending) {
     return (
       <View className="flex-1 items-center justify-center bg-surface">
-        <ActivityIndicator color="#D85314" />
+        <ActivityIndicator color="#B84800" />
       </View>
     );
   }
