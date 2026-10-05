@@ -15,7 +15,7 @@ export default function Moderation() {
   if (isPending) {
     return (
       <View className="flex-1 items-center justify-center bg-surface-sunken">
-        <ActivityIndicator color="#D85314" />
+        <ActivityIndicator color="#B84800" />
       </View>
     );
   }

@@ -43,6 +43,23 @@ module.exports = {
         // les cartes evenement de la direction 1 ne s'appuient pas sur une
         // bordure grise pour se decouper, mais sur l'aplat de couleur.
         line: "#E8DDCE",
+        // Etats semantiques (statut d'un evenement, resultat d'un scan...),
+        // jamais pour decorer — distinct de `accent` (couleur de marque
+        // ponctuelle : prix, badges). Avant ces tokens, chaque ecran
+        // recomposait sa propre nuance de rouge/vert/bleu/ambre Tailwind :
+        // jusqu'a trois verts differents pour le meme "succes" selon
+        // l'ecran. Chaque nuance ci-dessous reprend la teinte deja
+        // dominante dans le code (BadgeStatut de mes-evenements.tsx,
+        // CarteResultat du scanner), pas une nouvelle couleur inventee —
+        // consolidation, pas recreation. `ink` est systematiquement la
+        // nuance -800 plutot que -700 (ecart constate entre les deux
+        // ecrans sources) : contraste mesure superieur sur le fond -50
+        // correspondant, choisi par coherence pour les quatre roles plutot
+        // que de trancher au cas par cas.
+        succes: { DEFAULT: "#f0fdf4", ink: "#166534", border: "#bbf7d0" },
+        erreur: { DEFAULT: "#fef2f2", ink: "#991b1b", border: "#fecaca" },
+        attention: { DEFAULT: "#fffbeb", ink: "#92400e", border: "#fde68a" },
+        info: { DEFAULT: "#eff6ff", ink: "#1e40af", border: "#bfdbfe" },
       },
       fontFamily: {
         // Titres d'evenements : display condense tres epais, effet affiche
