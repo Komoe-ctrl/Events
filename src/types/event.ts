@@ -43,4 +43,6 @@ export type EvenementResume = {
   dateDebut: string;
   commune: string;
   adresse: string;
+  /** Absent (pas seulement vide) si la reservation n'est pas CONFIRMEE/UTILISEE. */
+  contactOrganisateur?: string;
 };
