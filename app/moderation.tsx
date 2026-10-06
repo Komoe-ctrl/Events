@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, RefreshControl, Text, View } from "react-native";
 import { CarteEvenement } from "@/components/CarteEvenement";
 import { EtatErreur } from "@/components/EtatErreur";
 import { EtatVide } from "@/components/EtatVide";
@@ -8,7 +8,7 @@ import { recupererEvenementsAModerer } from "@/features/events/api";
 import { ErreurApi } from "@/lib/apiClient";
 
 export default function Moderation() {
-  const { data, isPending, isError, error, refetch } = useQuery({
+  const { data, isPending, isError, error, isFetching, refetch } = useQuery({
     queryKey: ["evenements", "moderation"],
     queryFn: recupererEvenementsAModerer,
   });
@@ -72,6 +72,9 @@ export default function Moderation() {
       contentContainerClassName="px-4 pt-4 pb-8"
       data={evenements}
       keyExtractor={(item) => item.id}
+      refreshControl={
+        <RefreshControl refreshing={isFetching} onRefresh={() => refetch()} tintColor="#B84800" />
+      }
       ListHeaderComponent={
         <Text className="mb-3 text-sm font-medium text-ink-muted">
           {evenements.length} événement{evenements.length > 1 ? "s" : ""} en attente

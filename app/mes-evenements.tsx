@@ -1,6 +1,6 @@
 import { Link } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, RefreshControl, Text, View } from "react-native";
 import { Carte } from "@/components/Carte";
 import { Etiquette, type CouleurEtiquette } from "@/components/Etiquette";
 import { EtatErreur } from "@/components/EtatErreur";
@@ -11,7 +11,7 @@ import { formaterDateEvenement } from "@/lib/date";
 import type { Evenement, StatutEvenement } from "@/types/event";
 
 export default function MesEvenements() {
-  const { data, isPending, isError, refetch } = useQuery({
+  const { data, isPending, isError, isFetching, refetch } = useQuery({
     queryKey: ["evenements", "moi"],
     queryFn: recupererMesEvenements,
   });
@@ -52,6 +52,9 @@ export default function MesEvenements() {
       data={data}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => <CarteEvenementOrganisateur evenement={item} />}
+      refreshControl={
+        <RefreshControl refreshing={isFetching} onRefresh={() => refetch()} tintColor="#B84800" />
+      }
     />
   );
 }

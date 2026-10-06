@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "expo-router";
-import { SectionList, Text, View } from "react-native";
+import { RefreshControl, SectionList, Text, View } from "react-native";
 import { BadgeStatutReservation } from "@/components/BadgeStatutReservation";
 import { Carte } from "@/components/Carte";
 import { EtatErreur } from "@/components/EtatErreur";
@@ -11,7 +11,7 @@ import { formaterDateEvenement } from "@/lib/date";
 import type { Reservation } from "@/types/reservation";
 
 export default function MesReservations() {
-  const { data, isPending, isError, refetch } = useQuery({
+  const { data, isPending, isError, isFetching, refetch } = useQuery({
     queryKey: ["reservations", "moi"],
     queryFn: recupererMesReservations,
   });
@@ -67,6 +67,9 @@ export default function MesReservations() {
       contentContainerClassName="px-4 pt-4 pb-8"
       sections={sections}
       keyExtractor={(item) => item.id}
+      refreshControl={
+        <RefreshControl refreshing={isFetching} onRefresh={() => refetch()} tintColor="#B84800" />
+      }
       renderSectionHeader={({ section }) => (
         <Text className="mb-2 mt-4 text-sm font-medium uppercase text-ink-muted">
           {section.title}

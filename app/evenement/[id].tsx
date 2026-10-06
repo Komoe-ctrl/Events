@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import { Link, router, useLocalSearchParams } from "expo-router";
+import * as Haptics from "expo-haptics";
 import { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { Bouton } from "@/components/Bouton";
@@ -46,6 +47,10 @@ export default function FicheEvenement() {
   const mutationReservation = useMutation({
     mutationFn: (nombrePlaces: number) => creerReservation(id, nombrePlaces),
     onSuccess: () => {
+      // Action importante, pas chaque appui (CLAUDE.md) : une reservation
+      // confirmee merite un retour physique, contrairement au +/- du
+      // selecteur de places juste au-dessus.
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       queryClient.invalidateQueries({ queryKey: ["evenement", id] });
       queryClient.invalidateQueries({ queryKey: ["reservations", "moi"] });
     },
