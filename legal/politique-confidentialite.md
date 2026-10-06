@@ -78,8 +78,11 @@ compte (voir section 8).
 
 C'est le point le plus important à comprendre :
 
-- **Si vous réservez une place**, le contact affiché par l'organisateur de
-  l'événement (généralement son numéro de téléphone) vous est visible.
+- **Si vous réservez une place**, le contact que l'organisateur a choisi
+  d'afficher (généralement un numéro de téléphone) devient visible pour
+  vous dans l'application, tant que votre réservation reste active ou a
+  été utilisée à l'entrée. Si vous annulez votre réservation, ce contact
+  n'est plus accessible.
 - **Si vous publiez un événement et que quelqu'un réserve**, ce
   participant apparaît dans votre liste d'inscrits avec **son nom et son
   numéro de téléphone**, pour vous permettre de gérer les entrées.
