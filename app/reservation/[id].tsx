@@ -1,9 +1,10 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
-import { ActivityIndicator, Modal, Pressable, Text, View } from "react-native";
+import { ActivityIndicator, Linking, Modal, Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import QRCode from "react-native-qrcode-svg";
 import { Bouton } from "@/components/Bouton";
@@ -17,6 +18,45 @@ import {
 import { ErreurApi } from "@/lib/apiClient";
 import { formaterDateEvenement } from "@/lib/date";
 import { revenirOuAller } from "@/lib/navigation";
+import { interpreterContactOrganisateur } from "@/lib/telephone";
+
+/**
+ * Lien tel:/wa.me seulement si contactOrganisateur est un numero isole et
+ * bien forme (regle produit : jamais de lien sur une interpretation
+ * partielle d'un champ libre qui peut contenir deux numeros, un pseudo...).
+ * Sinon texte simple, selectionnable pour copier-coller, non cliquable.
+ */
+function ContactOrganisateur({ contact }: { contact: string }) {
+  const interprete = interpreterContactOrganisateur(contact);
+
+  if (interprete.type === "texte") {
+    return (
+      <Text selectable className="mt-1 text-sm text-white/80">
+        {interprete.affichage}
+      </Text>
+    );
+  }
+
+  return (
+    <View className="mt-1 flex-row items-center gap-4">
+      <Pressable
+        onPress={() => Linking.openURL(interprete.lienTel)}
+        className="flex-row items-center gap-2 active:opacity-70"
+      >
+        <Ionicons name="call-outline" size={16} color="#FFFFFF" />
+        <Text selectable className="text-sm text-white">
+          {interprete.affichage}
+        </Text>
+      </Pressable>
+      <Pressable
+        onPress={() => Linking.openURL(interprete.lienWhatsapp)}
+        className="active:opacity-70"
+      >
+        <Ionicons name="logo-whatsapp" size={18} color="#FFFFFF" />
+      </Pressable>
+    </View>
+  );
+}
 
 export default function DetailReservation() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -103,6 +143,14 @@ export default function DetailReservation() {
             {formaterDateEvenement(reservation.evenement.dateDebut)} ·{" "}
             {reservation.evenement.commune}
           </Text>
+          {reservation.evenement.contactOrganisateur ? (
+            <View className="mt-3">
+              <Text className="text-xs uppercase tracking-wide text-white/40">
+                Contact organisateur
+              </Text>
+              <ContactOrganisateur contact={reservation.evenement.contactOrganisateur} />
+            </View>
+          ) : null}
         </View>
       ) : null}
 
