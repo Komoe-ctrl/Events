@@ -152,15 +152,15 @@ export default function FicheEvenement() {
         <View className="mt-6">
           {reservationExistante ? (
             <Link href={`/reservation/${reservationExistante.id}`} asChild>
-              {/* Confirmation, pas une action : palette semantique verte
-                  (etat "actif/valide"), distincte de l'accent orange —
-                  meme famille que le badge CONFIRMEE. */}
-              <Pressable className="rounded-card bg-green-50 p-4 active:opacity-70">
-                <Text className="text-sm text-green-800">
+              {/* Confirmation, pas une action : token semantique succes
+                  (etat "actif/valide"), distinct de l'accent orange — meme
+                  famille que le badge CONFIRMEE (Etiquette). */}
+              <Pressable className="rounded-card bg-succes p-4 active:opacity-70">
+                <Text className="text-sm text-succes-ink">
                   Vous avez déjà réservé {reservationExistante.nombrePlaces} place
                   {reservationExistante.nombrePlaces > 1 ? "s" : ""}.
                 </Text>
-                <Text className="mt-1 text-sm text-green-700">
+                <Text className="mt-1 text-sm text-succes-ink">
                   Code : {reservationExistante.code}
                 </Text>
               </Pressable>
@@ -174,10 +174,13 @@ export default function FicheEvenement() {
               <View className="mb-4 flex-row items-center justify-between">
                 <Text className="text-sm font-medium text-ink">Nombre de places</Text>
                 <View className="flex-row items-center gap-4">
+                  {/* 44x44, pas 36x36 : zone tactile minimum (CLAUDE.md),
+                      relevee en reprenant cet ecran — absente de la liste de
+                      l'audit initial. */}
                   <Pressable
                     onPress={() => setNombrePlacesSaisi((n) => Math.max(1, n - 1))}
                     disabled={nombrePlaces <= 1}
-                    className="h-9 w-9 items-center justify-center rounded-full bg-surface-sunken disabled:opacity-30"
+                    className="h-11 w-11 items-center justify-center rounded-full bg-surface-sunken disabled:opacity-30"
                   >
                     <Text className="text-lg text-ink">−</Text>
                   </Pressable>
@@ -187,7 +190,7 @@ export default function FicheEvenement() {
                   <Pressable
                     onPress={() => setNombrePlacesSaisi((n) => Math.min(maxPlaces, n + 1))}
                     disabled={nombrePlaces >= maxPlaces}
-                    className="h-9 w-9 items-center justify-center rounded-full bg-surface-sunken disabled:opacity-30"
+                    className="h-11 w-11 items-center justify-center rounded-full bg-surface-sunken disabled:opacity-30"
                   >
                     <Text className="text-lg text-ink">+</Text>
                   </Pressable>
@@ -211,7 +214,7 @@ export default function FicheEvenement() {
           )}
 
           {mutationReservation.isError ? (
-            <Text className="mt-2 text-sm text-red-600">
+            <Text className="mt-2 text-sm text-erreur-ink">
               {mutationReservation.error.message}
             </Text>
           ) : null}
